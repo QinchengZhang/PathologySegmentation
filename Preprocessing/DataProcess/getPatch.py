@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-09-08 14:05:31
 LastEditors: TJUZQC
-LastEditTime: 2020-09-09 16:44:58
+LastEditTime: 2020-09-27 17:26:24
 Description: None
 '''
 import multiresolutionimageinterface as mir
@@ -16,32 +16,27 @@ import threading
 from libtiff import TIFF
 from PIL import Image
 
-# pathlist = glob.glob('2020-01-20 13.34.13')
-pathlist = ['2020-01-20 13.34.13', '2020-01-21 19.55.32', '2020-01-21 20.03.41', '2020-01-21 20.31.45', '2020-01-22 10.44.42'] 
-# 2020-01-20 13.34.13
-# '2020-01-20 23.05.54', '2020-01-20 23.17.39', '2020-01-21 00.18.11',
-img_reader = mir.MultiResolutionImageReader()
-mask_reader = mir.MultiResolutionImageReader()
 
 
+# 从xml标注中得到一个Annotation的边界信息，所得边界比真实边界大200px
 def getPositionAndSize(annotation):
-    X_min = 10000000
-    Y_min = 10000000
-    X_max = 0
-    Y_max = 0
+    X_min = None
+    Y_min = None
+    X_max = None
+    Y_max = None
     for coordinate in annotation.getCoordinates():
-        if coordinate.getX() > X_max:
+        if coordinate.getX() > X_max or X_max is None:
             X_max = coordinate.getX()
-        if coordinate.getX() < X_min:
+        if coordinate.getX() < X_min or X_min is None:
             X_min = coordinate.getX()
-        if coordinate.getY() < Y_min:
+        if coordinate.getY() < Y_min or Y_min is None:
             Y_min = coordinate.getY()
-        if coordinate.getY() > Y_max:
+        if coordinate.getY() > Y_max or Y_max is None:
             Y_max = coordinate.getY()
     return int(X_min)-200, int(Y_min)-200, int(X_max - X_min)+400, int(Y_max - Y_min) + 400
 
-
-def getPatch(pathlist, start, end):
+# 切patch
+def __getPatch(pathlist, start, end):
     print('getting start from {} to {}'.format(start, end))
     pathlist = pathlist[start:end] if end != -1 else pathlist[start:]
     for path in pathlist:
@@ -58,6 +53,9 @@ def getPatch(pathlist, start, end):
         img_name = img_name[0]
         xml_name = xml_name[0]
         mask_name = mask_name[0]
+
+        img_reader = mir.MultiResolutionImageReader()
+        mask_reader = mir.MultiResolutionImageReader()
 
         img = img_reader.open(img_name)
         mask = mask_reader.open(mask_name)
@@ -97,21 +95,20 @@ def getPatch(pathlist, start, end):
                 path, 'patch', 'masks', os.path.splitext(os.path.basename(img_name))[0]+'-{}.png'.format(idx)))
             del patch_mask
 
+def getPatch(pathlist, num_works):
+    num = int(len(pathlist)/num_works) if int(len(pathlist)/num_works) > 1 else 1
+    threads = []
+    for work_idx in range(num_works):
+        
+        threads.append(threading.Thread(target=__getPatch, args=(pathlist, work_idx*num, (work_idx+1)*num)))
+    for t in threads:
+        t.setDaemon(True)
+        t.start()
+    t.join()
+    print('All threads is done!')  
 
-getPatch(pathlist, 0, -1)
-# num = int(len(pathlist)/4)
-# threads = []
-# t1 = threading.Thread(target=getPatch, args=(pathlist, 1, num))
-# threads.append(t1)
-# t2 = threading.Thread(target=getPatch, args=(pathlist, num, num*2))
-# threads.append(t2)
-# t3 = threading.Thread(target=getPatch, args=(pathlist, num*2, num*3))
-# threads.append(t3)
-# t4 = threading.Thread(target=getPatch, args=(pathlist, num*3, -1))
-# threads.append(t4)
 
-# for t in threads:
-#     t.setDaemon(True)
-#     t.start()
-# t.join()
-# print('ok')
+if __name__ == '__main__':
+    path = 'G:\TJUZQC\DataSet\Beijing-small_cell_lung_cancer-pathology\\2020-01-20 10.39.42'
+    pathlist = glob.glob(path)
+    getPatch(pathlist, 6)
