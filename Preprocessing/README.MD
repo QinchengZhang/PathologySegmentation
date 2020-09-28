@@ -2,10 +2,25 @@
  * @Author: TJUZQC
  * @Date: 2020-09-27 14:20:01
  * @LastEditors: TJUZQC
- * @LastEditTime: 2020-09-27 14:34:59
+ * @LastEditTime: 2020-09-29 00:33:18
  * @Description: None
 -->
 # Preprocessing pathology data
+**Dependencies**
+```
+python 3.6.1
+ASAP 1.9(ASAP不是一个python库，不能用pip安装，请打开ASAP github主页下载对应release)
+numpy == 1.19.2
+opencv == 4.4
+Pillow == 7.2.0
+matplotlib == 3.3.2
+```
+[ASAP github主页](https://github.com/computationalpathologygroup/ASAP.git)
+**ASAP forpython安装教程**
+```
+Configure your PYTHONPATH environment variable to contain the /bin directory path.
+大体就是建立一个PYTHONPATH名字的环境变量，找到你安装ASAP的路径，将路径>>到/bin 这个路径放在PYTHONPATH环境变量中，这样，python就可以自动搜索到这个包了哦。
+```
 ## 文件结构
 ```
 │  README.MD

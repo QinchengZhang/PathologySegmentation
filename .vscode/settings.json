@@ -1,0 +1,9 @@
+{
+    "python.pythonPath": "E:\\anaconda3\\envs\\ASAP\\python.exe",
+    "python.testing.pytestArgs": [
+        "Training"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestEnabled": true
+}

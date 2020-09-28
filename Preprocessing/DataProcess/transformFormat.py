@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-09-08 17:51:09
 LastEditors: TJUZQC
-LastEditTime: 2020-09-17 16:17:27
+LastEditTime: 2020-09-29 00:17:36
 Description: None
 '''
 import multiresolutionimageinterface as mir
@@ -18,9 +18,11 @@ import threading
 reader = mir.MultiResolutionImageReader()
 
 
-def makeMask(pathlist, start, end):
+def makeMask(pathlist, start, end=None):
+    end = len(pathlist) + 1 if end is None else end
     print('processing pathlist from {} to {}'.format(start, end))
     for path in pathlist[start:end]:
+        print(path)
         img_name = glob.glob(os.path.join(path, '*.ndpi'))
         mask_name = glob.glob(os.path.join(path, '*.xml'))
         print(img_name)
@@ -43,9 +45,9 @@ def makeMask(pathlist, start, end):
         annotation_mask.convert(annotation_list, output_path, img.getDimensions(
         ), img.getSpacing(), label_map, conversion_order)
 
-pathlist = glob.glob('2020-01-22 10.44.42')
+pathlist = glob.glob('F:\DATASET\Beijing-small_cell_lung_cancer-pathology\\2020-01-20 10.39.42')
 # num = int(len(pathlist)/4)
-makeMask(pathlist, 0, -1)
+makeMask(['F:\DATASET\Beijing-small_cell_lung_cancer-pathology\\2020-01-20 10.39.42'], 0)
 # threads = []
 # t1 = threading.Thread(target=makeMask, args=(pathlist, 0, num))
 # threads.append(t1)
