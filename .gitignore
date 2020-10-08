@@ -1,2 +1,5 @@
 *.pth
 /mtk/__pycache__
+/mtk/.pytest_cache
+/mtk/.vscode
+/mtk/.idea
