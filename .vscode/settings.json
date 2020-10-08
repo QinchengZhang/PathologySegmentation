@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "E:\\anaconda3\\envs\\ASAP\\python.exe",
+    "python.pythonPath": "D:\\Anaconda3\\python.exe",
     "python.testing.pytestArgs": [
         "Training"
     ],
