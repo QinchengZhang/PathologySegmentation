@@ -11,10 +11,10 @@
 import glob
 import os
 
-import numpy as np
-from PIL import Image
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QBitmap, QPixmap, QIcon
+from numpy import array
+from PIL.Image import open as Iopen, fromarray
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFileDialog
 import evaluate
 
@@ -31,6 +31,7 @@ class Ui_MainWindow(object):
         self.path_image = None
         self.path_mask_GT = None
         self.path_mask_pred = None
+        self.current_path = None
 
         self.data = {'image': None, 'GT': None, 'pred': None}
 
@@ -196,21 +197,24 @@ class Ui_MainWindow(object):
 
     def chooseImageDir(self):
         self.path_image = QFileDialog.getExistingDirectory(
-            self.main_widget, "选择图片文件夹", "/")
+            self.main_widget, "选择图片文件夹", "/" if self.current_path is None else self.current_path)
+        self.current_path = os.path.split(self.path_image)[0]
         self.image_list = glob.glob(
             self.path_image + '/*.*[png, tiff, jpg, tif]')
         self.show('image')
 
     def chooseGTDir(self):
         self.path_mask_GT = QFileDialog.getExistingDirectory(
-            self.main_widget, "选择标注文件夹", "/")
+            self.main_widget, "选择标注文件夹", "/" if self.current_path is None else self.current_path)
+        self.current_path = os.path.split(self.path_image)[0]
         self.check_path()
         self.show('GT')
         self.show_merge('GT')
 
     def choosePredDir(self):
         self.path_mask_pred = QFileDialog.getExistingDirectory(
-            self.main_widget, "选择预测文件夹", "/")
+            self.main_widget, "选择预测文件夹", "/" if self.current_path is None else self.current_path)
+        self.current_path = os.path.split(self.path_image)[0]
         self.check_path(flag='pred')
         self.show('pred')
         self.show_merge('pred')
@@ -246,8 +250,8 @@ class Ui_MainWindow(object):
             path = self.path_mask_pred
             plotwindow = self.mask_pred
         try:
-            img = Image.open(os.path.join(path, name))
-            self.data[flag] = np.array(img)
+            img = Iopen(os.path.join(path, name))
+            self.data[flag] = array(img)
             if (flag == 'GT' and self.data['pred'] is not None) or (flag=='pred' and self.data['GT'] is not None):
                 dice = evaluate.DiceCoeff(self.data['pred'], self.data['GT'])
                 acc = evaluate.PixelAccuracy(self.data['pred'], self.data['GT'])
@@ -270,14 +274,14 @@ class Ui_MainWindow(object):
             plotwindow = self.merge_pred
         (_, name) = os.path.split(self.image_list[self.current_image_mark])
         try:
-            mask = Image.open(os.path.join(path, name))
-            image = Image.open(self.image_list[self.current_image_mark])
+            mask = Iopen(os.path.join(path, name))
+            image = Iopen(self.image_list[self.current_image_mark])
             mask = mask.resize((511, 431))
             image = image.resize((511, 431))
-            merge = np.array(image)
-            mask_arr = np.array(mask)
+            merge = array(image)
+            mask_arr = array(mask)
             merge[mask_arr == 0] = [0, 0, 0]
-            merge = Image.fromarray(merge)
+            merge = fromarray(merge)
             plotwindow.setPixmap(merge.toqpixmap())
         except FileNotFoundError as e:
             pass
