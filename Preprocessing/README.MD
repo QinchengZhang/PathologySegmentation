@@ -2,18 +2,21 @@
  * @Author: TJUZQC
  * @Date: 2020-09-27 14:20:01
  * @LastEditors: TJUZQC
- * @LastEditTime: 2020-09-29 00:33:18
+ * @LastEditTime: 2020-10-10 14:23:52
  * @Description: None
 -->
 # Preprocessing pathology data
 **Dependencies**
 ```
+ubuntu 18.04 LTS(由于windows无法安装spams库，所以我用了win10的子系统)
 python 3.6.1
 ASAP 1.9(ASAP不是一个python库，不能用pip安装，请打开ASAP github主页下载对应release)
 numpy == 1.19.2
 opencv == 4.4
 Pillow == 7.2.0
 matplotlib == 3.3.2
+tensorflow == 1.15.0
+spams == 2.6.1
 ```
 [ASAP github主页](https://github.com/computationalpathologygroup/ASAP.git)
 **ASAP forpython安装教程**
@@ -44,9 +47,9 @@ Configure your PYTHONPATH environment variable to contain the /bin directory pat
 │      ASAP.py
 │      DataProcess.py
 │      getPatch.py
+|      item.py
 │      transformFormat.py
 |      main.py
-|      test.py
         
 ```
 ### ColorNormalization模块

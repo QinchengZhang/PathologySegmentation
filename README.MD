@@ -2,7 +2,7 @@
  * @Author: TJUZQC
  * @Date: 2020-09-27 12:40:56
  * @LastEditors: TJUZQC
- * @LastEditTime: 2020-09-29 00:33:33
+ * @LastEditTime: 2020-10-10 14:32:46
  * @Description: None
 -->
 # Pathology segmentation implement with PyTorch.
@@ -19,17 +19,9 @@
 ---
 ## Dependencies
 
-- Python 3.6.1
-- PyTorch >= 1.1.0
-- Torchvision >= 0.3.0
-- future >= 0.18.2
-- matplotlib >= 3.1.3
-- numpy >= 1.16.0
-- Pillow >= 6.2.0
-- protobuf >= 3.11.3
-- tensorboard >= 1.14.0
-- tqdm >= 4.42.1
-- openslide >= 1.1.1
+```
+见各模块的Dependencies
+```
 
 ---
 ## 文件结构
@@ -51,7 +43,7 @@
 └─Training
             
 ```
-- ### [Preprocessing模块](./Preprocessing/README.MD)
+- ### [Preprocessing模块](./Preprocessing/README.md)
 
 - ### [SegmentationViewer模块](./SegmentationViewer/README.md)
 
@@ -64,5 +56,8 @@ The birth of this project is inseparable from the following projects:
 
 - **[Pytorch-UNet](https://github.com/milesial/Pytorch-UNet)：PyTorch implementation of the U-Net for image semantic segmentation with high quality images**
 
----
+- **[Fast_WSI_Color_Norm](https://github.com/abhinavdhere/Fast_WSI_Color_Norm.git): Codes for Fast GPU-Enabled Color Normalization of Whole Slide Images in Digital Pathology**
 
+- **[ASAP](https://github.com/computationalpathologygroup/ASAP.git): ASAP is an open source platform for visualizing, annotating and automatically analyzing whole-slide histopathology images.**
+
+---
