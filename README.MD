@@ -2,7 +2,7 @@
  * @Author: TJUZQC
  * @Date: 2020-09-27 12:40:56
  * @LastEditors: TJUZQC
- * @LastEditTime: 2020-10-10 14:32:46
+ * @LastEditTime: 2020-10-10 14:34:40
  * @Description: None
 -->
 # Pathology segmentation implement with PyTorch.
@@ -29,7 +29,7 @@
 │  README.MD
 │
 ├─Preprocessing
-│  ├─ColorNormalisation
+│  ├─ColorNormalization
 |  |
 │  |    
 │  ├─DataAugmentation

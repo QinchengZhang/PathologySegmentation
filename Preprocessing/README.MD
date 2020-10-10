@@ -28,7 +28,7 @@ Configure your PYTHONPATH environment variable to contain the /bin directory pat
 ```
 │  README.MD
 │  
-├─ColorNormalisation
+├─ColorNormalization
 │      Estimate_W.py
 │      main.py
 │      Run_ColorNorm.py
