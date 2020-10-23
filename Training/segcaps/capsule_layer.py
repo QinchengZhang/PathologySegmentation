@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-09-23 16:17:18
 LastEditors: TJUZQC
-LastEditTime: 2020-10-10 14:48:20
+LastEditTime: 2020-10-15 12:51:57
 Description: None
 '''
 import warnings
@@ -67,6 +67,7 @@ class CapsuleLayer(nn.Module):
             u_hat_t_list.append(u_hat_t)    #[N,H_1,W_1,t_1,z_1]
         v=self.update_routing(u_hat_t_list,k,N,H_1,W_1,t_0,t_1,routing)
         return v
+        
     def update_routing(self,u_hat_t_list, k, N, H_1, W_1, t_0, t_1, routing):
         one_kernel = torch.ones(1, t_1, k, k).cuda()  # 不需要学习
         b = torch.zeros(N, H_1, W_1, t_0, t_1).cuda()  # 不需要学习
