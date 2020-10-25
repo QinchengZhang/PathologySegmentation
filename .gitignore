@@ -1,7 +1,7 @@
 *.pth
-/mtk/__pycache__
-.pytest_cache
-.vscode
-.idea
+/mtk/__pycache__/
+/mtk/.pytest_cache/
+/mtk/.vscode/
+/mtk/.idea/
 *.yaml
-/mtk/checkpoints*
+/mtk/checkpoints*/
