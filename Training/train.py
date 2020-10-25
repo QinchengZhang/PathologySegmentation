@@ -33,7 +33,8 @@ def train_net(net,
               save_cp=True,
               img_scale=0.5,
               init_type='normal',
-              use_apex=False):
+              use_apex=False,
+              optimizer='adam'):
 
     init_weights(net, init_type)
     dataset = BasicDataset(dir_img, dir_mask, img_scale, train=True)
@@ -60,8 +61,20 @@ def train_net(net,
         Images scaling:  {img_scale}
         Use apex: {use_apex}
     ''')
-
-    optimizer = optim.RMSprop(net.parameters(), lr=lr, weight_decay=1e-8)
+    optimizers = {
+        'adadelta': optim.Adadelta,
+        'adagrad': optim.Adagrad,
+        'adam': optim.Adam,
+        'adamw': optim.AdamW,
+        'sparseadam': optim.SparseAdam,
+        'adamax': optim.Adamax,
+        'asgd':optim.ASGD,
+        'lbfgs':optim.LBFGS,
+        'rmsprop': optim.RMSprop,
+        'rprop': optim.Rprop,
+        'sgd': optim.SGD,
+    }
+    optimizer = optimizers.get(optimizer, None)(net.parameters(), lr=lr, weight_decay=1e-8)
     if use_apex:
         try:
             from apex import amp
@@ -151,23 +164,24 @@ def get_args():
     parser = argparse.ArgumentParser(description='Train the UNet on images and target masks',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-n', '--network', metavar='NETWORK', type=str,
-                        default='UNet', help='network type', dest='network')
-    parser.add_argument('-e', '--epochs', metavar='E', type=int, default=30,
+                        default=config['MODEL']['MODEL_NAME'], help='network type', dest='network')
+    parser.add_argument('-e', '--epochs', metavar='E', type=int, default=config['NUM_EPOCHS'],
                         help='Number of epochs', dest='epochs')
-    parser.add_argument('-b', '--batch-size', metavar='B', type=int, nargs='?', default=8,
+    parser.add_argument('-b', '--batch-size', metavar='B', type=int, nargs='?', default=config['BATCH_SIZE'],
                         help='Batch size', dest='batchsize')
-    parser.add_argument('-l', '--learning-rate', metavar='LR', type=float, nargs='?', default=1e-4,
+    parser.add_argument('-l', '--learning-rate', metavar='LR', type=float, nargs='?', default=config['LR'],
                         help='Learning rate', dest='lr')
-    parser.add_argument('-f', '--load', dest='load', type=str, default=False,
+    parser.add_argument('-f', '--load', dest='load', type=str, default=config['MODEL']['PRETRAINED_MODEL_DIR'],
                         help='Load model from a .pth file')
-    parser.add_argument('-s', '--scale', dest='scale', type=float, default=0.5,
+    parser.add_argument('-s', '--scale', dest='scale', type=float, default=config['SCALE'],
                         help='Downscaling factor of the images')
-    parser.add_argument('-v', '--validation', dest='val', type=float, default=10.0,
+    parser.add_argument('-v', '--validation', dest='val', type=float, default=config['VALIDATION'],
                         help='Percent of the data that is used as validation (0-100)')
-    parser.add_argument('-t', '--init-type', dest='init_type', type=str, default='kaiming',
-                        help='init weights type')
-    parser.add_argument('-a', '--use-apex', dest='use_apex', type=str, default='True',
+    parser.add_argument('-t', '--init-type', dest='init_type', type=str, default=config['INIT_TYPE'],
+                        help='Init weights type')
+    parser.add_argument('-a', '--use-apex', dest='use_apex', type=str, default=config['APEX'],
                         help='Automatic Mixed Precision')
+    parser.add_argument('-o', '--optimizer', dest='optimizer', type=str, default=config['OPTIMIZER'], help='Optimizer type')
 
     return parser.parse_args()
 
@@ -222,7 +236,8 @@ if __name__ == '__main__':
                   img_scale=args.scale,
                   val_percent=args.val / 100,
                   init_type=args.init_type,
-                  use_apex=(args.use_apex == "True"))
+                  use_apex=(args.use_apex == "True"),
+                  optimizer=args.optimizer.lower())
     except KeyboardInterrupt:
         torch.save(net.state_dict(), 'INTERRUPTED.pth')
         logging.info('Saved interrupt')
