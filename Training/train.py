@@ -16,11 +16,12 @@ from models import U_Net, R2AttU_Net, R2U_Net, AttU_Net, HSU_Net, init_weights
 from torch.utils.tensorboard import SummaryWriter
 from utils.dataset import BasicDataset
 from torch.utils.data import DataLoader, random_split
+import yaml
 
-
-dir_img = "/data/zhangqincheng/DATASET/small_cell_lung_cancer/imgs_augmented/"
-dir_mask = "/data/zhangqincheng/DATASET/small_cell_lung_cancer/masks_augmented/"
-dir_checkpoint = "/home/zhangqincheng123/workspace/PathologySegmentation/checkpoints_WSI/"
+config = yaml.load(open("config/config.yaml"))
+dir_img = config['DATASET']['IMGS_DIR']
+dir_mask = config['DATASET']['MASKS_DIR']
+dir_checkpoint = config['MODEL']['CHECKPOINT_DIR']
 
 
 def train_net(net,
@@ -90,7 +91,6 @@ def train_net(net,
                 imgs = imgs.to(device=device, dtype=torch.float32)
                 mask_type = torch.float32 if net.n_classes == 1 else torch.long
                 true_masks = true_masks.to(device=device, dtype=mask_type)
-
                 masks_pred = net(imgs)
                 loss = criterion(masks_pred, true_masks)
                 epoch_loss += loss.item()
