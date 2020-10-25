@@ -18,9 +18,9 @@ from utils.dataset import BasicDataset
 from torch.utils.data import DataLoader, random_split
 
 
-dir_img = "/data/zhangqincheng/small_cell_lung_cancer/imgs_augmented/"
-dir_mask = "/data/zhangqincheng/small_cell_lung_cancer/masks_augmented/"
-dir_checkpoint = "/home/zhangqincheng123/workspace/pytorch_segmentation/checkpoints_WSI/"
+dir_img = "/data/zhangqincheng/DATASET/small_cell_lung_cancer/imgs_augmented/"
+dir_mask = "/data/zhangqincheng/DATASET/small_cell_lung_cancer/masks_augmented/"
+dir_checkpoint = "/home/zhangqincheng123/workspace/PathologySegmentation/checkpoints_WSI/"
 
 
 def train_net(net,
