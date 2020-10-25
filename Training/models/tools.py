@@ -3,9 +3,11 @@
 Author: TJUZQC
 Date: 2020-10-25 13:47:32
 LastEditors: TJUZQC
-LastEditTime: 2020-10-25 13:47:35
+LastEditTime: 2020-10-25 13:49:18
 Description: None
 '''
+from torch.nn import init
+
 def init_weights(net, init_type='normal', gain=0.02):
     def init_func(m):
         classname = m.__class__.__name__
