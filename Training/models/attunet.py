@@ -15,6 +15,7 @@ class AttU_Net(nn.Module):
     def __init__(self,n_channels=3,n_classes=1, bilinear=True):
         self.n_channels = n_channels
         self.n_classes = n_classes
+        self.bilinear = bilinear
         super(AttU_Net,self).__init__()
         
         self.Maxpool = nn.MaxPool2d(kernel_size=2,stride=2)
