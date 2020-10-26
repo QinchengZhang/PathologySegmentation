@@ -3,12 +3,11 @@
 Author: TJUZQC
 Date: 2020-10-26 13:37:34
 LastEditors: TJUZQC
-LastEditTime: 2020-10-26 13:40:33
+LastEditTime: 2020-10-26 14:41:31
 Description: None
 '''
 import torch
 from torch.autograd import Function
-
 
 class PixelAccuracy(Function):
     """Pixel accuracy for individual examples"""
@@ -16,7 +15,7 @@ class PixelAccuracy(Function):
     def forward(self, input, target):
         assert input.shape == target.shape, f'the size of input and target must be same'
         tmp = input == target
-        acc = sum(tmp).float() / input.nelement()
+        acc = torch.sum(tmp).float() / input.nelement()
         # acc = np.sum(input[target == input])/np.sum(input)
         return acc
 
