@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-25 13:08:10
 LastEditors: TJUZQC
-LastEditTime: 2020-10-26 10:33:28
+LastEditTime: 2020-10-26 12:41:24
 Description: None
 '''
 import torch
@@ -126,6 +126,7 @@ class HSBlock(nn.Module):
         self.stride = stride
 
     def forward(self, x):
+        self.split_list = []
         self.last_split = None
         channels = x.shape[1]
         assert channels == self.w*self.split, f'input channels({channels}) is not equal to w({self.w})*split({self.split})'
@@ -178,4 +179,6 @@ class HSBottleNeck(nn.Module):
             )
 
     def forward(self, x):
-        return nn.ReLU(inplace=True)(self.residual_function(x) + self.shortcut(x))
+        residual = self.residual_function(x)
+        shortcut = self.shortcut(x)
+        return nn.ReLU(inplace=True)(residual + shortcut)
