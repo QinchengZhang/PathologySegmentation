@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-09-17 15:51:56
 LastEditors: TJUZQC
-LastEditTime: 2020-10-26 14:31:46
+LastEditTime: 2020-10-26 14:42:55
 Description: None
 '''
 import torch
@@ -41,5 +41,5 @@ def eval_net(net, loader, device, n_val):
                                           true_mask.squeeze(dim=1))
                     tot += dice_coeff(pred, true_mask.squeeze(dim=1)).item()
             pbar.update(imgs.shape[0])
-    print(acc, tot)
-    return tot / n_val, 0.
+    # print(acc/ n_val, tot / n_val)
+    return tot / n_val, acc/ n_val
