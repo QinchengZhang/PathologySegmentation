@@ -18,7 +18,7 @@ from utils.dataset import BasicDataset
 from torch.utils.data import DataLoader, random_split
 import yaml
 
-config = yaml.load(open("config/config.yaml"))
+config = yaml.load(open("config/config.yaml"), Loader=yaml.FullLoader)
 dir_img = config['DATASET']['IMGS_DIR']
 dir_mask = config['DATASET']['MASKS_DIR']
 dir_checkpoint = config['MODEL']['CHECKPOINT_DIR']
