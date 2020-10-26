@@ -5,4 +5,5 @@ __pycache__/
 .idea/
 *.yaml
 checkpoints*/
+*.0
 runs/*

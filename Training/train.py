@@ -9,7 +9,7 @@ import torch.nn as nn
 from torch import optim
 from tqdm import tqdm
 
-from eval import eval_net
+from evaluation import eval_net
 # from unet import U_Net, R2U_Net, AttU_Net, R2AttU_Net, init_weights
 from models import U_Net, R2AttU_Net, R2U_Net, AttU_Net, HSU_Net, init_weights
 

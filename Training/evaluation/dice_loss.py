@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+'''
+Author: TJUZQC
+Date: 2020-09-17 15:51:56
+LastEditors: TJUZQC
+LastEditTime: 2020-10-26 13:35:31
+Description: None
+'''
 import torch
 from torch.autograd import Function
 
