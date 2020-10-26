@@ -3,15 +3,15 @@
 Author: TJUZQC
 Date: 2020-09-17 15:51:56
 LastEditors: TJUZQC
-LastEditTime: 2020-10-26 13:42:46
+LastEditTime: 2020-10-26 13:51:52
 Description: None
 '''
 import torch
 import torch.nn.functional as F
 from tqdm import tqdm
 
-from dice_loss import dice_coeff
-from pixel_accuracy import pixel_accuracy
+from .dice_loss import dice_coeff
+from .pixel_accuracy import pixel_accuracy
 
 
 def eval_net(net, loader, device, n_val):
