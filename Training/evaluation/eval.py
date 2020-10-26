@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-09-17 15:51:56
 LastEditors: TJUZQC
-LastEditTime: 2020-10-26 14:42:55
+LastEditTime: 2020-10-26 14:44:11
 Description: None
 '''
 import torch
@@ -38,7 +38,7 @@ def eval_net(net, loader, device, n_val):
                                            true_mask.unsqueeze(dim=0)).item()
                 else:
                     acc += pixel_accuracy(pred,
-                                          true_mask.squeeze(dim=1))
+                                          true_mask.squeeze(dim=1)).item()
                     tot += dice_coeff(pred, true_mask.squeeze(dim=1)).item()
             pbar.update(imgs.shape[0])
     # print(acc/ n_val, tot / n_val)
