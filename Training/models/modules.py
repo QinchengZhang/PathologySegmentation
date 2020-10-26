@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-25 13:08:10
 LastEditors: TJUZQC
-LastEditTime: 2020-10-25 13:15:36
+LastEditTime: 2020-10-26 10:33:28
 Description: None
 '''
 import torch
@@ -142,6 +142,8 @@ class HSBlock(nn.Module):
                     nn.BatchNorm2d(temp.shape[1]),
                     nn.ReLU(inplace=True)
                 )
+                if isinstance(temp, torch.cuda.FloatTensor) or isinstance(temp, torch.cuda.DoubleTensor):
+                    ops = ops.to('cuda')
                 temp = ops(temp)
                 x1, x2 = self._split(temp)
                 del temp
