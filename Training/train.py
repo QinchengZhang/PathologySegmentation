@@ -128,16 +128,19 @@ def train_net(net,
                 b2 = global_step % a2
 
                 if global_step % (len(dataset) // (10 * batch_size)) == 0:
-                    val_score = eval_net(net, val_loader, device, n_val)
+                    dice_coeff, pA = eval_net(net, val_loader, device, n_val)
                     if net.n_classes > 1:
                         logging.info(
-                            'Validation cross entropy: {}'.format(val_score))
-                        writer.add_scalar('Loss/test', val_score, global_step)
+                            'Validation cross entropy: {}'.format(dice_coeff))
+                        writer.add_scalar('Loss/test', dice_coeff, global_step)
 
                     else:
                         logging.info(
-                            'Validation Dice Coeff: {}'.format(val_score))
-                        writer.add_scalar('Dice/test', val_score, global_step)
+                            'Validation Dice Coeff: {}'.format(dice_coeff))
+                        writer.add_scalar('Dice/test', dice_coeff, global_step)
+                        logging.info(
+                            'Validation Pixel Accuracy: {}'.format(pA))
+                        writer.add_scalar('pA/test', pA, global_step)
 
                     writer.add_images('images', imgs, global_step)
                     if net.n_classes == 1:
