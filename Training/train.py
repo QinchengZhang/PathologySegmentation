@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-26 10:26:51
 LastEditors: TJUZQC
-LastEditTime: 2020-10-28 12:22:45
+LastEditTime: 2020-10-28 14:59:27
 Description: None
 '''
 import argparse
@@ -112,6 +112,9 @@ def train_net(net,
                 imgs = imgs.to(device=device, dtype=torch.float32)
                 mask_type = torch.float32 if net.n_classes == 1 else torch.long
                 true_masks = true_masks.to(device=device, dtype=mask_type)
+                if net.n_classes > 1:
+                    b, c, w, h = true_masks.shape
+                    true_masks = true_masks.view(b, w, h)
                 masks_pred = net(imgs)
                 loss = criterion(masks_pred, true_masks)
                 epoch_loss += loss.item()
