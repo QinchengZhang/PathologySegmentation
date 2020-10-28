@@ -1,3 +1,5 @@
+from Training.evaluation.f1score import f1score
+from Training.evaluation.precision import precision
 import argparse
 import logging
 import os
@@ -128,7 +130,7 @@ def train_net(net,
                 b2 = global_step % a2
 
                 if global_step % (len(dataset) // (10 * batch_size)) == 0:
-                    dice_coeff, pA = eval_net(net, val_loader, device, n_val)
+                    dice_coeff, pA, oA, precision, recall, f1score  = eval_net(net, val_loader, device, n_val)
                     if net.n_classes > 1:
                         logging.info(
                             'Validation cross entropy: {}'.format(dice_coeff))
@@ -141,6 +143,18 @@ def train_net(net,
                         logging.info(
                             'Validation Pixel Accuracy: {}'.format(pA))
                         writer.add_scalar('pA/test', pA, global_step)
+                        logging.info(
+                            'Validation Overall Accuracy: {}'.format(oA))
+                        writer.add_scalar('oA/test', oA, global_step)
+                        logging.info(
+                            'Validation Precision: {}'.format(precision))
+                        writer.add_scalar('precision/test', precision, global_step)
+                        logging.info(
+                            'Validation Recall: {}'.format(recall))
+                        writer.add_scalar('recall/test', recall, global_step)
+                        logging.info(
+                            'Validation F1-score: {}'.format(f1score))
+                        writer.add_scalar('F1-score/test', f1score, global_step)
 
                     writer.add_images('images', imgs, global_step)
                     if net.n_classes == 1:
