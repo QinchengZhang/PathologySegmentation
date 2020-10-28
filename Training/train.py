@@ -230,7 +230,7 @@ if __name__ == '__main__':
               'r2attunet': R2AttU_Net,
               'hsunet': HSU_Net,
               }
-    net = switch.get(network, None)(n_channels=3, n_classes=1)
+    net = switch.get(network, None)(n_channels=3, n_classes=config['DATASET']['NUM_CLASSES'])
     assert net is not None, f'check your argument --network'
     # net = AttU_Net(n_channels=3,n_classes=1)
     # net = AttU_Net(n_channels=3, n_classes=1)
