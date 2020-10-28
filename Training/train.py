@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-26 10:26:51
 LastEditors: TJUZQC
-LastEditTime: 2020-10-28 15:21:50
+LastEditTime: 2020-10-28 16:11:27
 Description: None
 '''
 import argparse
@@ -51,9 +51,9 @@ def train_net(net,
     n_train = len(dataset) - n_val
     train, val = random_split(dataset, [n_train, n_val])
     train_loader = DataLoader(
-        train, batch_size=batch_size, shuffle=True, num_workers=8, pin_memory=True)
+        train, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True)
     val_loader = DataLoader(val, batch_size=batch_size,
-                            shuffle=False, num_workers=8, pin_memory=True)
+                            shuffle=False, num_workers=0, pin_memory=True)
 
     writer = SummaryWriter(
         comment=f'LR_{lr}_BS_{batch_size}_SCALE_{img_scale}')
@@ -223,7 +223,7 @@ if __name__ == '__main__':
                         format='%(levelname)s: %(message)s')
     args = get_args()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    device = torch.device('cpu')
+    # device = torch.device('cpu')
     logging.info(f'Using device {device}')
 
     # Change here to adapt to your data
