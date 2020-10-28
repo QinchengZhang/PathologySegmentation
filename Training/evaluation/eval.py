@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-09-17 15:51:56
 LastEditors: TJUZQC
-LastEditTime: 2020-10-27 14:16:39
+LastEditTime: 2020-10-28 12:24:06
 Description: None
 '''
 import torch
@@ -13,7 +13,7 @@ from tqdm import tqdm
 from .dice_loss import dice_coeff
 from .pixel_accuracy import pixel_accuracy
 from .overall_accuracy import overall_accuracy
-from .precision import Pricision, precision
+from .precision import precision
 from .recall import recall
 from .f1score import f1score
 
