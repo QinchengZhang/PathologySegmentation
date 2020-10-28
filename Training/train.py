@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-26 10:26:51
 LastEditors: TJUZQC
-LastEditTime: 2020-10-28 14:59:27
+LastEditTime: 2020-10-28 15:21:50
 Description: None
 '''
 import argparse
@@ -18,6 +18,7 @@ from torch import optim
 from tqdm import tqdm
 
 from evaluation import eval_net
+import sys
 # from unet import U_Net, R2U_Net, AttU_Net, R2AttU_Net, init_weights
 from models import U_Net, R2AttU_Net, R2U_Net, AttU_Net, HSU_Net, init_weights
 
@@ -26,10 +27,10 @@ from utils.dataset import BasicDataset
 from torch.utils.data import DataLoader, random_split
 import yaml
 
-config = yaml.load(open("config/config.yaml"), Loader=yaml.FullLoader)
-dir_img = config['DATASET']['IMGS_DIR']
-dir_mask = config['DATASET']['MASKS_DIR']
-dir_checkpoint = config['MODEL']['CHECKPOINT_DIR']
+conf = yaml.load(open(os.path.join(sys.path[0], 'config', 'config.yaml')), Loader=yaml.FullLoader)
+dir_img = conf['DATASET']['IMGS_DIR']
+dir_mask = conf['DATASET']['MASKS_DIR']
+dir_checkpoint = conf['MODEL']['CHECKPOINT_DIR']
 
 
 def train_net(net,
@@ -76,13 +77,14 @@ def train_net(net,
         'adamw': optim.AdamW,
         'sparseadam': optim.SparseAdam,
         'adamax': optim.Adamax,
-        'asgd':optim.ASGD,
-        'lbfgs':optim.LBFGS,
+        'asgd': optim.ASGD,
+        'lbfgs': optim.LBFGS,
         'rmsprop': optim.RMSprop,
         'rprop': optim.Rprop,
         'sgd': optim.SGD,
     }
-    optimizer = optimizers.get(optimizer, None)(net.parameters(), lr=lr, weight_decay=1e-8)
+    optimizer = optimizers.get(optimizer, None)(
+        net.parameters(), lr=lr, weight_decay=1e-8)
     if use_apex:
         try:
             from apex import amp
@@ -139,7 +141,8 @@ def train_net(net,
                 b2 = global_step % a2
 
                 if global_step % (len(dataset) // (10 * batch_size)) == 0:
-                    dice_coeff, pA, oA, precision, recall, f1score  = eval_net(net, val_loader, device, n_val)
+                    dice_coeff, pA, oA, precision, recall, f1score = eval_net(
+                        net, val_loader, device, n_val)
                     if net.n_classes > 1:
                         logging.info(
                             'Validation cross entropy: {}'.format(dice_coeff))
@@ -157,13 +160,15 @@ def train_net(net,
                         writer.add_scalar('oA/test', oA, global_step)
                         logging.info(
                             'Validation Precision: {}'.format(precision))
-                        writer.add_scalar('precision/test', precision, global_step)
+                        writer.add_scalar('precision/test',
+                                          precision, global_step)
                         logging.info(
                             'Validation Recall: {}'.format(recall))
                         writer.add_scalar('recall/test', recall, global_step)
                         logging.info(
                             'Validation F1-score: {}'.format(f1score))
-                        writer.add_scalar('F1-score/test', f1score, global_step)
+                        writer.add_scalar(
+                            'F1-score/test', f1score, global_step)
 
                     writer.add_images('images', imgs, global_step)
                     if net.n_classes == 1:
@@ -190,24 +195,25 @@ def get_args():
     parser = argparse.ArgumentParser(description='Train the UNet on images and target masks',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-n', '--network', metavar='NETWORK', type=str,
-                        default=config['MODEL']['MODEL_NAME'], help='network type', dest='network')
-    parser.add_argument('-e', '--epochs', metavar='E', type=int, default=config['NUM_EPOCHS'],
+                        default=conf['MODEL']['MODEL_NAME'], help='network type', dest='network')
+    parser.add_argument('-e', '--epochs', metavar='E', type=int, default=conf['NUM_EPOCHS'],
                         help='Number of epochs', dest='epochs')
-    parser.add_argument('-b', '--batch-size', metavar='B', type=int, nargs='?', default=config['BATCH_SIZE'],
+    parser.add_argument('-b', '--batch-size', metavar='B', type=int, nargs='?', default=conf['BATCH_SIZE'],
                         help='Batch size', dest='batchsize')
-    parser.add_argument('-l', '--learning-rate', metavar='LR', type=float, nargs='?', default=config['LR'],
+    parser.add_argument('-l', '--learning-rate', metavar='LR', type=float, nargs='?', default=conf['LR'],
                         help='Learning rate', dest='lr')
-    parser.add_argument('-f', '--load', dest='load', type=str, default=config['MODEL']['PRETRAINED_MODEL_DIR'],
+    parser.add_argument('-f', '--load', dest='load', type=str, default=conf['MODEL']['PRETRAINED_MODEL_DIR'],
                         help='Load model from a .pth file')
-    parser.add_argument('-s', '--scale', dest='scale', type=float, default=config['SCALE'],
+    parser.add_argument('-s', '--scale', dest='scale', type=float, default=conf['SCALE'],
                         help='Downscaling factor of the images')
-    parser.add_argument('-v', '--validation', dest='val', type=float, default=config['VALIDATION'],
+    parser.add_argument('-v', '--validation', dest='val', type=float, default=conf['VALIDATION'],
                         help='Percent of the data that is used as validation (0-100)')
-    parser.add_argument('-t', '--init-type', dest='init_type', type=str, default=config['INIT_TYPE'],
+    parser.add_argument('-t', '--init-type', dest='init_type', type=str, default=conf['INIT_TYPE'],
                         help='Init weights type')
-    parser.add_argument('-a', '--use-apex', dest='use_apex', type=str, default=config['APEX'],
+    parser.add_argument('-a', '--use-apex', dest='use_apex', type=str, default=conf['APEX'],
                         help='Automatic Mixed Precision')
-    parser.add_argument('-o', '--optimizer', dest='optimizer', type=str, default=config['OPTIMIZER'], help='Optimizer type')
+    parser.add_argument('-o', '--optimizer', dest='optimizer',
+                        type=str, default=conf['OPTIMIZER'], help='Optimizer type')
 
     return parser.parse_args()
 
@@ -217,6 +223,7 @@ if __name__ == '__main__':
                         format='%(levelname)s: %(message)s')
     args = get_args()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device('cpu')
     logging.info(f'Using device {device}')
 
     # Change here to adapt to your data
@@ -233,7 +240,8 @@ if __name__ == '__main__':
               'r2attunet': R2AttU_Net,
               'hsunet': HSU_Net,
               }
-    net = switch.get(network, None)(n_channels=3, n_classes=config['DATASET']['NUM_CLASSES'])
+    net = switch.get(network, None)(
+        n_channels=3, n_classes=conf['DATASET']['NUM_CLASSES'])
     assert net is not None, f'check your argument --network'
     # net = AttU_Net(n_channels=3,n_classes=1)
     # net = AttU_Net(n_channels=3, n_classes=1)
