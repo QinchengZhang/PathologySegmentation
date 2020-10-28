@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-09-16 14:03:12
 LastEditors: TJUZQC
-LastEditTime: 2020-10-28 15:47:06
+LastEditTime: 2020-10-28 16:13:59
 Description: None
 '''
 from os.path import splitext
@@ -74,7 +74,6 @@ class BasicDataset(Dataset):
 
     def __getitem__(self, i):
         idx = self.ids[i]
-        print(idx)
         mask_file = glob(self.masks_dir + idx + '.*[png,jpg,tiff,tif]')
         img_file = glob(self.imgs_dir + idx + '.*[png,jpg,tiff,tif]')
         assert len(mask_file) == 1, \
