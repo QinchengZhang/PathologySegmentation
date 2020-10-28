@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-09-16 14:03:12
 LastEditors: TJUZQC
-LastEditTime: 2020-10-28 12:20:45
+LastEditTime: 2020-10-28 12:33:35
 Description: None
 '''
 from os.path import splitext
@@ -18,11 +18,12 @@ from torchvision import transforms
 
 
 class BasicDataset(Dataset):
-    def __init__(self, imgs_dir, masks_dir, scale=1, train=True):
+    def __init__(self, imgs_dir, masks_dir, scale=1, train=True, classes=2):
         self.train = train
         self.imgs_dir = imgs_dir
         self.masks_dir = masks_dir
         self.scale = scale
+        self.classes = classes
         assert 0 < scale <= 1, 'Scale must be between 0 and 1'
 
         self.ids = [splitext(file)[0] for file in listdir(imgs_dir)
@@ -33,7 +34,7 @@ class BasicDataset(Dataset):
         return len(self.ids)
 
     @classmethod
-    def preprocess(cls, pil_img, scale):
+    def preprocess(cls, pil_img, scale) -> np.ndarray:
         w, h = pil_img.size
         newW, newH = int(scale * w), int(scale * h)
         assert newW > 0 and newH > 0, 'Scale is too small'
@@ -51,6 +52,26 @@ class BasicDataset(Dataset):
 
         return img_trans
 
+    @classmethod
+    def preprocess_mask(cls, pil_img, scale, classes=2) -> np.ndarray:
+        w, h = pil_img.size
+        newW, newH = int(scale * w), int(scale * h)
+        assert newW > 0 and newH > 0, 'Scale is too small'
+        pil_img = pil_img.resize((newW, newH))
+
+        img_nd = np.array(pil_img)
+
+        if len(img_nd.shape) == 2:
+            img_nd = np.expand_dims(img_nd, axis=2)
+
+        # HWC to CHW
+        img_trans = img_nd.transpose((2, 0, 1))
+        if classes <= 2:
+            if img_trans.max() > 1:
+                img_trans = img_trans / 255
+
+        return img_trans
+
     def __getitem__(self, i):
         idx = self.ids[i]
         mask_file = glob(self.masks_dir + idx + '.*[png,jpg,tiff,tif]')
@@ -65,6 +86,6 @@ class BasicDataset(Dataset):
         assert img.size == mask.size, \
             f'Image and mask {idx} should be the same size, but are {img.size} and {mask.size}'
         img = self.preprocess(img, self.scale)
-        mask = self.preprocess(mask, self.scale)
+        mask = self.preprocess_mask(mask, self.scale, self.classes)
 
         return {'image': torch.from_numpy(img), 'mask': torch.from_numpy(mask)}
