@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-26 10:26:51
 LastEditors: TJUZQC
-LastEditTime: 2020-10-28 16:22:07
+LastEditTime: 2020-10-28 16:25:59
 Description: None
 '''
 import argparse
@@ -223,8 +223,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO,
                         format='%(levelname)s: %(message)s')
     args = get_args()
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    # device = torch.device('cpu')
+    device = torch.device('cuda' if torch.cuda.is_available() and conf['DEVICE'].lower() == 'cuda' else 'cpu')
     logging.info(f'Using device {device}')
 
     # Change here to adapt to your data
