@@ -1,5 +1,11 @@
-from Training.evaluation.f1score import f1score
-from Training.evaluation.precision import precision
+# -*- coding: utf-8 -*-
+'''
+Author: TJUZQC
+Date: 2020-10-26 10:26:51
+LastEditors: TJUZQC
+LastEditTime: 2020-10-28 12:22:45
+Description: None
+'''
 import argparse
 import logging
 import os

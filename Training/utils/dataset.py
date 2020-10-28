@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-09-16 14:03:12
 LastEditors: TJUZQC
-LastEditTime: 2020-09-16 18:00:41
+LastEditTime: 2020-10-28 12:20:45
 Description: None
 '''
 from os.path import splitext
@@ -28,7 +28,6 @@ class BasicDataset(Dataset):
         self.ids = [splitext(file)[0] for file in listdir(imgs_dir)
                     if not file.startswith('.')]
         logging.info(f'Creating dataset with {len(self.ids)} examples')
-
 
     def __len__(self):
         return len(self.ids)
