@@ -14,7 +14,6 @@ import torch.nn.functional as F
 import sys
 # from unet import U_Net, R2U_Net, AttU_Net, R2AttU_Net, init_weights
 from models import U_Net, R2AttU_Net, R2U_Net, AttU_Net, HSU_Net, FCN1s, FCN8s, FCN16s, FCN32s, init_weights
-from thop import profile
 
 from torch.utils.tensorboard import SummaryWriter
 from utils.dataset import BasicDataset
