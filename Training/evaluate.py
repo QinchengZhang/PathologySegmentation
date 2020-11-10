@@ -14,6 +14,7 @@ import torch.nn.functional as F
 import sys
 # from unet import U_Net, R2U_Net, AttU_Net, R2AttU_Net, init_weights
 from models import U_Net, R2AttU_Net, R2U_Net, AttU_Net, HSU_Net, FCN1s, FCN8s, FCN16s, FCN32s, init_weights
+from thop import profile
 
 from torch.utils.tensorboard import SummaryWriter
 from utils.dataset import BasicDataset
@@ -24,7 +25,6 @@ conf = yaml.load(open(os.path.join(
     sys.path[0], 'config', 'config.yaml')), Loader=yaml.FullLoader)
 dir_img = conf['DATASET']['IMGS_DIR']
 dir_mask = conf['DATASET']['MASKS_DIR']
-dir_checkpoint = conf['MODEL']['CHECKPOINT_DIR']
 
 
 def evaluate_net(net,
@@ -74,6 +74,7 @@ def evaluate_net(net,
     pre = 0
     recal = 0
     f1s = 0
+    flops, params = None, None
     for batch in tqdm(val_loader):
         imgs = batch['image']
         true_masks = batch['mask']
@@ -83,6 +84,8 @@ def evaluate_net(net,
             'the images are loaded correctly.'
 
         imgs = imgs.to(device=device, dtype=torch.float32)
+        if flops is None or params is None:
+            flops, params = profile(net, inputs=(imgs, ))
         mask_type = torch.float32 if net.n_classes == 1 else torch.long
         true_masks = true_masks.to(device=device, dtype=mask_type)
         if net.n_classes > 1:
@@ -116,11 +119,13 @@ def evaluate_net(net,
     pre /= n_val
     recal /= n_val
     f1s /= n_val
-    
+
     if net.n_classes > 1:
         logging.info(f'Validation loss:{epoch_loss}')
         logging.info(
             'Validation cross entropy: {}'.format(tot))
+        logging.info(f'FLOPS in this model is: {flops}')
+        logging.info(f'Params in this model is: {params}')
         writer.add_scalar('Loss/test', tot, global_step)
 
     else:
@@ -145,6 +150,8 @@ def evaluate_net(net,
             'Validation F1-score: {}'.format(f1s))
         writer.add_scalar(
             'F1-score/test', f1s, global_step)
+        logging.info(f'FLOPS in this model is: {flops}')
+        logging.info(f'Params in this model is: {params}')
 
     writer.close()
 
