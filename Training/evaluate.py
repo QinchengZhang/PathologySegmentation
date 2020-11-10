@@ -109,6 +109,14 @@ def evaluate_net(net,
                                 true_mask.squeeze(dim=1)).item()
                 f1s += f1score(pred,
                                true_mask.squeeze(dim=1)).item()
+    epoch_loss /= n_val
+    tot /= n_val
+    PA /= n_val
+    OA /= n_val
+    pre /= n_val
+    recal /= n_val
+    f1s /= n_val
+    
     if net.n_classes > 1:
         logging.info(f'Validation loss:{epoch_loss}')
         logging.info(
