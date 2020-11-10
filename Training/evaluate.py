@@ -26,6 +26,11 @@ conf = yaml.load(open(os.path.join(
 dir_img = conf['DATASET']['IMGS_DIR']
 dir_mask = conf['DATASET']['MASKS_DIR']
 
+def count_param(model):
+    param_count = 0
+    for param in model.parameters():
+        param_count += param.view(-1).size()[0]
+    return param_count
 
 def evaluate_net(net,
                  device,
@@ -74,7 +79,7 @@ def evaluate_net(net,
     pre = 0
     recal = 0
     f1s = 0
-    flops, params = None, None
+    params = None
     for batch in tqdm(val_loader):
         imgs = batch['image']
         true_masks = batch['mask']
@@ -84,8 +89,8 @@ def evaluate_net(net,
             'the images are loaded correctly.'
 
         imgs = imgs.to(device=device, dtype=torch.float32)
-        if flops is None or params is None:
-            flops, params = profile(net, inputs=(imgs, ))
+        if params is None:
+            params = count_param()
         mask_type = torch.float32 if net.n_classes == 1 else torch.long
         true_masks = true_masks.to(device=device, dtype=mask_type)
         if net.n_classes > 1:
@@ -124,7 +129,6 @@ def evaluate_net(net,
         logging.info(f'Validation loss:{epoch_loss}')
         logging.info(
             'Validation cross entropy: {}'.format(tot))
-        logging.info(f'FLOPS in this model is: {flops}')
         logging.info(f'Params in this model is: {params}')
         writer.add_scalar('Loss/test', tot, global_step)
 
@@ -150,7 +154,6 @@ def evaluate_net(net,
             'Validation F1-score: {}'.format(f1s))
         writer.add_scalar(
             'F1-score/test', f1s, global_step)
-        logging.info(f'FLOPS in this model is: {flops}')
         logging.info(f'Params in this model is: {params}')
 
     writer.close()
