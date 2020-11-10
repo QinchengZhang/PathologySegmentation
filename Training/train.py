@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-26 10:26:51
 LastEditors: TJUZQC
-LastEditTime: 2020-11-10 12:16:50
+LastEditTime: 2020-11-10 14:35:06
 Description: None
 '''
 import argparse
@@ -41,12 +41,10 @@ def train_net(net,
               val_percent=0.1,
               save_cp=True,
               img_scale=0.5,
-              init_type='normal',
               use_apex=False,
               optimizer='adam',
               classes=2):
 
-    init_weights(net, init_type)
     dataset = BasicDataset(dir_img, dir_mask, img_scale, train=True, classes=classes)
     n_val = int(len(dataset) * val_percent)
     n_train = len(dataset) - n_val
@@ -254,7 +252,7 @@ if __name__ == '__main__':
                  f'\t{net.n_classes} output channels (classes)\n'
                  f'\t{"Bilinear" if net.bilinear else "Dilated conv"} upscaling\n'
                  f'\tApex is {"using" if args.use_apex == "True" else "not using"}')
-
+    init_weights(net, args.init_type)
     if args.load:
         net.load_state_dict(
             torch.load(args.load, map_location=device)
@@ -273,7 +271,6 @@ if __name__ == '__main__':
                   device=device,
                   img_scale=args.scale,
                   val_percent=args.val / 100,
-                  init_type=args.init_type,
                   use_apex=(args.use_apex == "True"),
                   optimizer=args.optimizer.lower(),
                   classes=conf['DATASET']['NUM_CLASSES'])
