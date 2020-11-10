@@ -90,7 +90,7 @@ def evaluate_net(net,
 
         imgs = imgs.to(device=device, dtype=torch.float32)
         if params is None:
-            params = count_param()
+            params = count_param(net)
         mask_type = torch.float32 if net.n_classes == 1 else torch.long
         true_masks = true_masks.to(device=device, dtype=mask_type)
         if net.n_classes > 1:
