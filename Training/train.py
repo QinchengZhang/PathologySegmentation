@@ -3,9 +3,10 @@
 Author: TJUZQC
 Date: 2020-10-26 10:26:51
 LastEditors: TJUZQC
-LastEditTime: 2020-10-28 16:25:59
+LastEditTime: 2020-11-10 12:05:27
 Description: None
 '''
+from Training.models.fcn import FCN16s, FCN1s, FCN32s, FCN8s
 import argparse
 import logging
 import os
@@ -239,6 +240,10 @@ if __name__ == '__main__':
               'attunet': AttU_Net,
               'r2attunet': R2AttU_Net,
               'hsunet': HSU_Net,
+              'fcn8s': FCN8s,
+              'fcn16s': FCN16s,
+              'fcn32s': FCN32s,
+              'fcn1s': FCN1s,
               }
     net = switch.get(network, None)(
         n_channels=3, n_classes=conf['DATASET']['NUM_CLASSES'])
