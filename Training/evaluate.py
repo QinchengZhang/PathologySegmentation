@@ -68,6 +68,12 @@ def evaluate_net(net,
     net.eval()
 
     epoch_loss = 0
+    tot = 0
+    PA = 0
+    OA = 0
+    pre = 0
+    recal = 0
+    f1s = 0
     for batch in tqdm(val_loader):
         imgs = batch['image']
         true_masks = batch['mask']
@@ -86,12 +92,6 @@ def evaluate_net(net,
         loss = criterion(masks_pred, true_masks)
         epoch_loss += loss.item()
         writer.add_scalar('Loss/train', loss.item(), global_step)
-        tot = 0
-        PA = 0
-        OA = 0
-        pre = 0
-        recal = 0
-        f1s = 0
         for true_mask, pred in zip(true_masks, masks_pred):
             pred = (pred > 0.5).float()
             if net.n_classes > 1:
@@ -109,41 +109,34 @@ def evaluate_net(net,
                                 true_mask.squeeze(dim=1)).item()
                 f1s += f1score(pred,
                                true_mask.squeeze(dim=1)).item()
-        if net.n_classes > 1:
-            logging.info(f'Validation loss:{loss.item()}')
-            logging.info(
-                'Validation cross entropy: {}'.format(tot))
-            writer.add_scalar('Loss/test', tot, global_step)
+    if net.n_classes > 1:
+        logging.info(f'Validation loss:{epoch_loss}')
+        logging.info(
+            'Validation cross entropy: {}'.format(tot))
+        writer.add_scalar('Loss/test', tot, global_step)
 
-        else:
-            logging.info(f'Validation loss:{loss.item()}')
-            logging.info(
-                'Validation Dice Coeff: {}'.format(tot))
-            writer.add_scalar('Dice/test', tot, global_step)
-            logging.info(
-                'Validation Pixel Accuracy: {}'.format(PA))
-            writer.add_scalar('pA/test', PA, global_step)
-            logging.info(
-                'Validation Overall Accuracy: {}'.format(OA))
-            writer.add_scalar('oA/test', OA, global_step)
-            logging.info(
-                'Validation Precision: {}'.format(pre))
-            writer.add_scalar('precision/test',
-                              pre, global_step)
-            logging.info(
-                'Validation Recall: {}'.format(recal))
-            writer.add_scalar('recall/test', recal, global_step)
-            logging.info(
-                'Validation F1-score: {}'.format(f1s))
-            writer.add_scalar(
-                'F1-score/test', f1s, global_step)
-
-        writer.add_images('images', imgs, global_step)
-        if net.n_classes == 1:
-            writer.add_images(
-                'masks/true', true_masks, global_step)
-            writer.add_images(
-                'masks/pred', torch.sigmoid(masks_pred) > 0.5, global_step)
+    else:
+        logging.info(f'Validation loss:{epoch_loss}')
+        logging.info(
+            'Validation Dice Coeff: {}'.format(tot))
+        writer.add_scalar('Dice/test', tot, global_step)
+        logging.info(
+            'Validation Pixel Accuracy: {}'.format(PA))
+        writer.add_scalar('pA/test', PA, global_step)
+        logging.info(
+            'Validation Overall Accuracy: {}'.format(OA))
+        writer.add_scalar('oA/test', OA, global_step)
+        logging.info(
+            'Validation Precision: {}'.format(pre))
+        writer.add_scalar('precision/test',
+                          pre, global_step)
+        logging.info(
+            'Validation Recall: {}'.format(recal))
+        writer.add_scalar('recall/test', recal, global_step)
+        logging.info(
+            'Validation F1-score: {}'.format(f1s))
+        writer.add_scalar(
+            'F1-score/test', f1s, global_step)
 
     writer.close()
 
