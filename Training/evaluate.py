@@ -199,15 +199,9 @@ if __name__ == '__main__':
 
     try:
         evaluate_net(net=net,
-                     epochs=args.epochs,
                      batch_size=args.batchsize,
-                     lr=args.lr,
                      device=device,
                      img_scale=args.scale,
-                     val_percent=args.val / 100,
-                     init_type=args.init_type,
-                     use_apex=(args.use_apex == "True"),
-                     optimizer=args.optimizer.lower(),
                      classes=conf['DATASET']['NUM_CLASSES'])
     except KeyboardInterrupt:
         torch.save(net.state_dict(), 'INTERRUPTED.pth')
