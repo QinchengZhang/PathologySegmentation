@@ -184,8 +184,7 @@ if __name__ == '__main__':
     logging.info(f'Network:\n'
                  f'\t{net.n_channels} input channels\n'
                  f'\t{net.n_classes} output channels (classes)\n'
-                 f'\t{"Bilinear" if net.bilinear else "Dilated conv"} upscaling\n'
-                 f'\tApex is {"using" if args.use_apex == "True" else "not using"}')
+                 f'\t{"Bilinear" if net.bilinear else "Dilated conv"} upscaling\n')
 
     if args.load:
         net.load_state_dict(
