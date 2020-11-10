@@ -32,9 +32,11 @@ def get_upsample_weight(in_channels, out_channels, kernel_size):
     return torch.from_numpy(weight).float()
 
 class FCN32s(nn.Module):
-    def __init__(self, pretrained_net='vgg16',n_channels=3, n_classes=1):
+    def __init__(self, pretrained_net='vgg16',n_channels=3, n_classes=1, bilinear=True):
         super().__init__()
-        self.n_class = n_classes
+        self.bilinear = bilinear
+        self.n_channels = n_channels
+        self.n_classes = n_classes
         self.pretrained_net = VGGNet(model=pretrained_net)
         self.relu = nn.ReLU(inplace=True)
         self.deconv1 = nn.ConvTranspose2d(512, 512, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
