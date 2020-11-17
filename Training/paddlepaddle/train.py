@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-11-17 12:40:20
 LastEditors: TJUZQC
-LastEditTime: 2020-11-17 16:05:41
+LastEditTime: 2020-11-17 16:12:59
 Description: None
 '''
 import paddle
@@ -64,7 +64,7 @@ optim = paddle.optimizer.RMSProp(learning_rate=0.001,
 
 #         # 梯度清零
 #         optim.clear_grad()
-model.prepare(optim, paddle.nn.BCEWithLogitsLoss())
+model.prepare(optim, paddle.nn.BCEWithLogitsLoss()) 
 model.fit(train_dataset,
           val_dataset,
           epochs=15,
