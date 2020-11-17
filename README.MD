@@ -2,7 +2,7 @@
  * @Author: TJUZQC
  * @Date: 2020-09-27 12:40:56
  * @LastEditors: TJUZQC
- * @LastEditTime: 2020-10-10 14:34:40
+ * @LastEditTime: 2020-11-17 15:18:28
  * @Description: None
 -->
 # Pathology segmentation implement with PyTorch.
@@ -47,7 +47,9 @@
 
 - ### [SegmentationViewer模块](./SegmentationViewer/README.md)
 
-- ### [Training模块](./Training/README.md)
+- ### [Training模块-PyTorch实现](./Training/pytorch/README.md)
+
+- ### [Training模块-PaddlePaddle实现](./Taining/paddlepaddle/README.md)
 
 ---
 ## Thanks
