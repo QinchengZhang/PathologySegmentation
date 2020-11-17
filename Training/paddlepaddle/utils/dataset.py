@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-11-17 10:46:07
 LastEditors: TJUZQC
-LastEditTime: 2020-11-17 12:48:55
+LastEditTime: 2020-11-17 15:47:06
 Description: None
 '''
 from glob import glob
@@ -96,7 +96,7 @@ class SegDataset(Dataset):
         img = self.preprocess(img, self.scale)
         mask = self.preprocess_mask(mask, self.scale, self.classes)
 
-        return paddle.to_tensor(img), paddle.to_tensor(mask)
+        return paddle.to_tensor(img, dtype='float32'), paddle.to_tensor(mask, dtype='float32')
 
 
 if __name__ == '__main__':

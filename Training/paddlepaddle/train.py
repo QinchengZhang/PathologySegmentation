@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-11-17 12:40:20
 LastEditors: TJUZQC
-LastEditTime: 2020-11-17 14:50:22
+LastEditTime: 2020-11-17 16:05:41
 Description: None
 '''
 import paddle
@@ -32,41 +32,43 @@ optim = paddle.optimizer.RMSProp(learning_rate=0.001,
                                  epsilon=1e-07,
                                  centered=False,
                                  parameters=model.parameters())
-loss_func = paddle.nn.BCEWithLogitsLoss()
+# loss_func = paddle.nn.BCEWithLogitsLoss()
 
-for i in range(5):
-    for batch_id, data in enumerate(train_loader()):
-        x_data = data[0]            # 训练数据
-        y_data = data[1]            # 训练数据标签
-        x_data = x_data.astype('float32')
-        y_data = y_data.astype('float32')
-        print(x_data.dtype, y_data.dtype)
-        predicts = network(x_data)    # 预测结果
-        # print(predicts)
+# for i in range(5):
+#     for batch_id, data in enumerate(train_loader()):
+#         x_data = data[0]            # 训练数据
+#         y_data = data[1]            # 训练数据标签
+#         x_data = x_data.astype('float32')
+#         y_data = y_data.astype('float32')
+#         print(x_data.dtype, y_data.dtype)
+#         predicts = network(x_data)    # 预测结果
+#         # print(predicts)
 
-        # 计算损失 等价于 prepare 中loss的设置
-        loss = loss_func(predicts, y_data)
+#         # 计算损失 等价于 prepare 中loss的设置
+#         loss = loss_func(predicts, y_data)
 
-        # 计算准确率 等价于 prepare 中metrics的设置
-        m_iou, _, _ = paddle.metric.mean_iou(predicts.astype('int32'), y_data.astype('int32'), 1)
-        # print(m_iou)
+#         # 计算准确率 等价于 prepare 中metrics的设置
+#         m_iou, _, _ = paddle.metric.mean_iou(predicts.astype('int32'), y_data.astype('int32'), 1)
+#         # print(m_iou)
 
-        # 下面的反向传播、打印训练信息、更新参数、梯度清零都被封装到 Model.fit() 中
+#         # 下面的反向传播、打印训练信息、更新参数、梯度清零都被封装到 Model.fit() 中
 
-        # 反向传播
-        loss.backward()
+#         # 反向传播
+#         loss.backward()
 
-        if (batch_id+1) % 5 == 0:
-            print("epoch: {}, batch_id: {}, loss is: {}, acc is: {}".format(i, batch_id, loss.numpy(), m_iou.numpy()))
+#         if (batch_id+1) % 5 == 0:
+#             print("epoch: {}, batch_id: {}, loss is: {}, acc is: {}".format(i, batch_id, loss.numpy(), m_iou.numpy()))
 
-        # 更新参数
-        optim.step()
+#         # 更新参数
+#         optim.step()
 
-        # 梯度清零
-        optim.clear_grad()
-# model.prepare(optim, paddle.nn.BCEWithLogitsLoss())
-# model.fit(train_dataset,
-        #   val_dataset,
-        #   epochs=15,
-        #   batch_size=1,
-        #   verbose=1)
+#         # 梯度清零
+#         optim.clear_grad()
+model.prepare(optim, paddle.nn.BCEWithLogitsLoss())
+model.fit(train_dataset,
+          val_dataset,
+          epochs=15,
+          batch_size=1,
+          verbose=1,
+          save_dir="checkpoints_WSI",
+          num_workers=8)
