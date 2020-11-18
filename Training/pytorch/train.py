@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-26 10:26:51
 LastEditors: TJUZQC
-LastEditTime: 2020-11-10 14:35:06
+LastEditTime: 2020-11-18 13:50:56
 Description: None
 '''
 import argparse
@@ -183,7 +183,7 @@ def train_net(net,
             except OSError:
                 pass
             torch.save(net.state_dict(),
-                       dir_checkpoint + f'CP_epoch{epoch + 1}_loss_{str(loss.item())}.pth')
+                       os.path.join(dir_checkpoint, f'CP_epoch{epoch + 1}_loss_{str(loss.item())}.pth'))
             logging.info(
                 f'Checkpoint {epoch + 1} saved ! loss (batch) = ' + str(loss.item()))
 

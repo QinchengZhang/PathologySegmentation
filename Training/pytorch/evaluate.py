@@ -21,7 +21,7 @@ from torch.utils.data import DataLoader, random_split
 import yaml
 
 conf = yaml.load(open(os.path.join(
-    sys.path[0], 'config', 'config.yaml')), Loader=yaml.FullLoader)
+    sys.path[0], 'config', 'evaluate.yaml')), Loader=yaml.FullLoader)
 dir_img = conf['DATASET']['IMGS_DIR']
 dir_mask = conf['DATASET']['MASKS_DIR']
 
@@ -165,8 +165,8 @@ def get_args():
                         default=conf['MODEL']['MODEL_NAME'], help='network type', dest='network')
     parser.add_argument('-b', '--batch-size', metavar='B', type=int, nargs='?', default=conf['BATCH_SIZE'],
                         help='Batch size', dest='batchsize')
-    parser.add_argument('-f', '--load', dest='load', type=str,
-                        help='Load model from a .pth file', required=True)
+    parser.add_argument('-f', '--load', dest='load', type=str, default=conf['MODEL']['LOAD_PATH'],
+                        help='Load model from a .pth file')
     parser.add_argument('-s', '--scale', dest='scale', type=float, default=conf['SCALE'],
                         help='Downscaling factor of the images')
 

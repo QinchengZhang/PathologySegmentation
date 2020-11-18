@@ -3,24 +3,25 @@
 Author: TJUZQC
 Date: 2020-11-17 12:40:20
 LastEditors: TJUZQC
-LastEditTime: 2020-11-17 16:12:59
+LastEditTime: 2020-11-18 11:46:38
 Description: None
 '''
 import paddle
 from paddle.fluid.layers.nn import scale
 from models import HSU_Net
 from utils import *
+from paddle.static import InputSpec
 
-paddle.set_device('cpu')
+# paddle.set_device('cpu')
 num_classes = 1
 network = HSU_Net()
 model = paddle.Model(network)
 model.summary((-1, 3, 512, 512))
 
-train_dataset = SegDataset("G:\TJUZQC\code\python\PathologySegmentation\Training\pytorch\data\WSI\imgs",
-                           "G:\TJUZQC\code\python\PathologySegmentation\Training\pytorch\data\WSI\masks", scale=0.5) # 训练数据集
-val_dataset = SegDataset("G:\TJUZQC\code\python\PathologySegmentation\Training\pytorch\data\WSI\imgs",
-                         "G:\TJUZQC\code\python\PathologySegmentation\Training\pytorch\data\WSI\masks", train=False, scale=0.5) # 验证数据集
+train_dataset = SegDataset("F:/DATASET/Beijing-small_cell_lung_cancer-pathology/imgs_color_normalized",
+                           "F:/DATASET/Beijing-small_cell_lung_cancer-pathology/masks", scale=0.5) # 训练数据集
+val_dataset = SegDataset("F:/DATASET/Beijing-small_cell_lung_cancer-pathology/test_images",
+                         "F:/DATASET/Beijing-small_cell_lung_cancer-pathology/test_masks", train=False, scale=0.5) # 验证数据集
 
 train_loader = paddle.io.DataLoader(train_dataset, places=paddle.CPUPlace(), batch_size=1, shuffle=True)
 val_loader = paddle.io.DataLoader(val_dataset, places=paddle.CPUPlace(), batch_size=1, shuffle=False)
@@ -64,11 +65,17 @@ optim = paddle.optimizer.RMSProp(learning_rate=0.001,
 
 #         # 梯度清零
 #         optim.clear_grad()
+input = InputSpec([None, 3, 512, 512], 'float32', 'x')
+label = InputSpec([None, 1, 512, 512], 'int64', 'label')
 model.prepare(optim, paddle.nn.BCEWithLogitsLoss()) 
+# model.load('E:/WorkSpaces/PythonWorkSpace/PathologySegmentation/Training/paddlepaddle/checkpoints_WSI/train/final.pdparams')
+# model.save('E:/WorkSpaces/PythonWorkSpace/PathologySegmentation/Training/paddlepaddle/checkpoints_WSI/test', training=False)
 model.fit(train_dataset,
           val_dataset,
-          epochs=15,
+          epochs=1,
           batch_size=1,
           verbose=1,
-          save_dir="checkpoints_WSI",
+          save_dir="E:/WorkSpaces/PythonWorkSpace/PathologySegmentation/Training/paddlepaddle/checkpoints_WSI",
           num_workers=8)
+# model.load('E:/WorkSpaces/PythonWorkSpace/PathologySegmentation/Training/paddlepaddle/checkpoints_WSI/train/final.pdparams')
+model.save('E:/WorkSpaces/PythonWorkSpace/PathologySegmentation/Training/paddlepaddle/checkpoints_WSI/test', training=False)

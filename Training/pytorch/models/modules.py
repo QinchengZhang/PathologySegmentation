@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-25 13:08:10
 LastEditors: TJUZQC
-LastEditTime: 2020-10-26 12:41:24
+LastEditTime: 2020-11-18 15:51:22
 Description: None
 '''
 import torch
@@ -115,6 +115,51 @@ class Attention_block(nn.Module):
         psi = self.psi(psi)
 
         return x*psi
+
+class HSBlock_NEW(nn.Module):
+    def __init__(self, w:int, split:int, stride:int=1) -> None:
+        super(HSBlock_NEW, self).__init__()
+        self.split_list = []
+        self.last_split = None
+        self.w = w
+        self.channel = w*split
+        self.split = split
+        self.stride = stride
+        self.ops_list = []
+        for s in range(1, self.split):
+            hc = int((2**(s)-1)/2**(s-1)*self.w)
+            self.ops_list.append(nn.Sequential(
+                nn.Conv2d(hc, hc, kernel_size=3, padding=1, stride=self.stride),
+                nn.BatchNorm2d(hc),
+                nn.ReLU(inplace=True),
+                ))
+
+    def forward(self, x):
+        split_list = []
+        last_split = None
+        split_list.append(x[:, 0:self.w, :, :])
+        for s in range(1, self.split):
+            if x.is_cuda:
+                    self.ops_list[s-1].to('cuda')
+            if last_split is None:
+                temp = self.ops_list[s-1](x[:, s*self.w:(s+1)*self.w, :, :])
+                x1, x2 = self._split(temp)
+                split_list.append(x1)
+                last_split = x2
+            else:
+                temp = torch.cat(
+                    [last_split, x[:, s*self.w:(s+1)*self.w, :, :]], dim=1)
+                temp = self.ops_list[s-1](temp)
+                x1, x2 = self._split(temp)
+                split_list.append(x1)
+                last_split = x2
+        split_list.append(last_split)
+        del last_split
+        return torch.cat(split_list, dim=1)
+
+    def _split(self, x):
+        channels = int(x.shape[1]/2)
+        return x[:, 0:channels, :, :], x[:, channels:, :, :]
 
 class HSBlock(nn.Module):
     def __init__(self, w:int, split:int, stride:int=1) -> None:
