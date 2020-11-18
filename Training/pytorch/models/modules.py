@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-25 13:08:10
 LastEditors: TJUZQC
-LastEditTime: 2020-11-18 16:28:12
+LastEditTime: 2020-11-18 17:12:04
 Description: None
 '''
 import torch
@@ -122,40 +122,38 @@ class HSBlock_NEW(nn.Module):
         self.split_list = []
         self.last_split = None
         self.w = w
-        self.channel = w*split
         self.split = split
         self.stride = stride
-        self.ops_list = []
-        for s in range(1, self.split):
-            hc = int((2**(s)-1)/2**(s-1)*self.w)
-            self.ops_list.append(nn.Sequential(
-                nn.Conv2d(hc, hc, kernel_size=3, padding=1, stride=self.stride),
-                nn.BatchNorm2d(hc),
-                nn.ReLU(inplace=True),
-                ))
 
     def forward(self, x):
-        split_list = []
-        last_split = None
-        split_list.append(x[:, 0:self.w, :, :])
+        self.split_list = []
+        self.last_split = None
+        channels = x.shape[1]
+        assert channels == self.w*self.split, f'input channels({channels}) is not equal to w({self.w})*split({self.split})'
+        self.split_list.append(x[:, 0:self.w, :, :])
         for s in range(1, self.split):
+            hc = int((2**(s)-1)/2**(s-1)*self.w)
+            ops = nn.Sequential(
+                    nn.Conv2d(hc, hc, kernel_size=3, padding=1, stride=self.stride),
+                    nn.BatchNorm2d(hc),
+                    nn.ReLU(inplace=True)
+                )
             if x.is_cuda:
-                    self.ops_list[s-1].to('cuda')
-            if last_split is None:
-                temp = self.ops_list[s-1](x[:, s*self.w:(s+1)*self.w, :, :])
+                ops = ops.to('cuda')
+            if self.last_split is None:
+                temp = ops(x[:, s*self.w:(s+1)*self.w, :, :])
                 x1, x2 = self._split(temp)
-                split_list.append(x1)
-                last_split = x2
+                self.split_list.append(x1)
+                self.last_split = x2
             else:
-                temp = torch.cat(
-                    [last_split, x[:, s*self.w:(s+1)*self.w, :, :]], dim=1)
-                temp = self.ops_list[s-1](temp)
+                temp = torch.cat([self.last_split, x[:, s*self.w:(s+1)*self.w, :, :]], dim=1)
+                temp = ops(temp)
                 x1, x2 = self._split(temp)
-                split_list.append(x1)
-                last_split = x2
-        split_list.append(last_split)
-        del last_split
-        return torch.cat(split_list, dim=1)
+                del temp
+                self.split_list.append(x1)
+                self.last_split = x2
+        self.split_list.append(self.last_split)
+        return torch.cat(self.split_list, dim=1)
 
     def _split(self, x):
         channels = int(x.shape[1]/2)
