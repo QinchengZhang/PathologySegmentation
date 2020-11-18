@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-25 13:08:10
 LastEditors: TJUZQC
-LastEditTime: 2020-11-18 15:51:22
+LastEditTime: 2020-11-18 16:28:12
 Description: None
 '''
 import torch
@@ -211,6 +211,32 @@ class HSBottleNeck(nn.Module):
             nn.BatchNorm2d(self.w*split),
             nn.ReLU(inplace=True),
             HSBlock(self.w, split, stride),
+            nn.BatchNorm2d(self.w*split),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(self.w*split, out_channels, kernel_size=1, stride=stride),
+            nn.BatchNorm2d(out_channels)
+        )
+        self.shortcut = nn.Sequential()
+        if stride != 1 or in_channels != out_channels:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(in_channels, out_channels, stride=stride, kernel_size=1, bias=False),
+                nn.BatchNorm2d(out_channels)
+            )
+
+    def forward(self, x):
+        residual = self.residual_function(x)
+        shortcut = self.shortcut(x)
+        return nn.ReLU(inplace=True)(residual + shortcut)
+
+class HSBottleNeck_NEW(nn.Module):
+    def __init__(self, in_channels:int, out_channels:int, split:int, stride:int=1) -> None:
+        super(HSBottleNeck_NEW, self).__init__()
+        self.w = max(2**(split-2), 1)
+        self.residual_function = nn.Sequential(
+            nn.Conv2d(in_channels, self.w*split, kernel_size=1, stride=stride),
+            nn.BatchNorm2d(self.w*split),
+            nn.ReLU(inplace=True),
+            HSBlock_NEW(self.w, split, stride),
             nn.BatchNorm2d(self.w*split),
             nn.ReLU(inplace=True),
             nn.Conv2d(self.w*split, out_channels, kernel_size=1, stride=stride),
