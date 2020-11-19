@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-26 10:26:51
 LastEditors: TJUZQC
-LastEditTime: 2020-11-19 12:41:54
+LastEditTime: 2020-11-19 13:29:59
 Description: None
 '''
 import argparse
@@ -20,7 +20,7 @@ from tqdm import tqdm
 from evaluation import eval_net
 import sys
 # from unet import U_Net, R2U_Net, AttU_Net, R2AttU_Net, init_weights
-from models import U_Net, R2AttU_Net, R2U_Net, AttU_Net, HSU_Net, FCN1s, FCN8s, FCN16s, FCN32s,init_weights
+from models import U_Net, R2AttU_Net, R2U_Net, AttU_Net, HSU_Net, FCN1s, FCN8s, FCN16s, FCN32s,init_weights, HSU_Net_OLD
 
 from torch.utils.tensorboard import SummaryWriter
 from utils.dataset import BasicDataset
