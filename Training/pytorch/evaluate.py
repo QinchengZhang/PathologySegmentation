@@ -13,7 +13,7 @@ from evaluation import *
 import torch.nn.functional as F
 import sys
 # from unet import U_Net, R2U_Net, AttU_Net, R2AttU_Net, init_weights
-from models import U_Net, R2AttU_Net, R2U_Net, AttU_Net, HSU_Net, FCN1s, FCN8s, FCN16s, FCN32s, init_weights
+from models import U_Net, R2AttU_Net, R2U_Net, AttU_Net, HSU_Net, FCN1s, FCN8s, FCN16s, FCN32s, HSU_Net_OLD
 
 from torch.utils.tensorboard import SummaryWriter
 from utils.dataset import BasicDataset
@@ -51,19 +51,6 @@ def evaluate_net(net,
         Device:          {device.type}
         Images scaling:  {img_scale}
     ''')
-    optimizers = {
-        'adadelta': optim.Adadelta,
-        'adagrad': optim.Adagrad,
-        'adam': optim.Adam,
-        'adamw': optim.AdamW,
-        'sparseadam': optim.SparseAdam,
-        'adamax': optim.Adamax,
-        'asgd': optim.ASGD,
-        'lbfgs': optim.LBFGS,
-        'rmsprop': optim.RMSprop,
-        'rprop': optim.Rprop,
-        'sgd': optim.SGD,
-    }
 
     if net.n_classes > 1:
         criterion = nn.CrossEntropyLoss()
@@ -198,6 +185,7 @@ if __name__ == '__main__':
               'fcn16s': FCN16s,
               'fcn32s': FCN32s,
               'fcn1s': FCN1s,
+              'hsunetold': HSU_Net_OLD,
               }
     net = switch.get(network, None)(
         n_channels=3, n_classes=conf['DATASET']['NUM_CLASSES'])
