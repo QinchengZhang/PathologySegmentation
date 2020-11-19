@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-25 13:08:10
 LastEditors: TJUZQC
-LastEditTime: 2020-11-18 17:12:04
+LastEditTime: 2020-11-19 10:43:07
 Description: None
 '''
 import torch
@@ -119,18 +119,16 @@ class Attention_block(nn.Module):
 class HSBlock_NEW(nn.Module):
     def __init__(self, w:int, split:int, stride:int=1) -> None:
         super(HSBlock_NEW, self).__init__()
-        self.split_list = []
-        self.last_split = None
         self.w = w
         self.split = split
         self.stride = stride
 
     def forward(self, x):
-        self.split_list = []
-        self.last_split = None
+        split_list = []
+        last_split = None
         channels = x.shape[1]
         assert channels == self.w*self.split, f'input channels({channels}) is not equal to w({self.w})*split({self.split})'
-        self.split_list.append(x[:, 0:self.w, :, :])
+        split_list.append(x[:, 0:self.w, :, :])
         for s in range(1, self.split):
             hc = int((2**(s)-1)/2**(s-1)*self.w)
             ops = nn.Sequential(
@@ -140,20 +138,20 @@ class HSBlock_NEW(nn.Module):
                 )
             if x.is_cuda:
                 ops = ops.to('cuda')
-            if self.last_split is None:
+            if last_split is None:
                 temp = ops(x[:, s*self.w:(s+1)*self.w, :, :])
                 x1, x2 = self._split(temp)
-                self.split_list.append(x1)
-                self.last_split = x2
+                split_list.append(x1)
+                last_split = x2
             else:
-                temp = torch.cat([self.last_split, x[:, s*self.w:(s+1)*self.w, :, :]], dim=1)
+                temp = torch.cat([last_split, x[:, s*self.w:(s+1)*self.w, :, :]], dim=1)
                 temp = ops(temp)
                 x1, x2 = self._split(temp)
                 del temp
-                self.split_list.append(x1)
-                self.last_split = x2
-        self.split_list.append(self.last_split)
-        return torch.cat(self.split_list, dim=1)
+                split_list.append(x1)
+                last_split = x2
+        split_list.append(last_split)
+        return torch.cat(split_list, dim=1)
 
     def _split(self, x):
         channels = int(x.shape[1]/2)
