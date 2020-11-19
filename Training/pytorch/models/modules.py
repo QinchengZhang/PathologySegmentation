@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-25 13:08:10
 LastEditors: TJUZQC
-LastEditTime: 2020-11-19 13:34:22
+LastEditTime: 2020-11-19 13:35:44
 Description: None
 '''
 import torch
@@ -205,7 +205,7 @@ class HSBlock(nn.Module):
             #     self. = ops.to('cuda')
             temp = torch.cat([last_split, x[:, s*self.w:(s+1)*self.w, :, :]],
                              dim=1) if last_split is not None else x[:, s*self.w:(s+1)*self.w, :, :]
-            temp = self.conv_list[s](temp)
+            temp = self.conv_list[s-1](temp)
             x1, x2 = self._split(temp)
             del temp
             retfeature = torch.cat([retfeature, x1], dim=1)
