@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-25 13:08:10
 LastEditors: TJUZQC
-LastEditTime: 2020-11-19 10:43:07
+LastEditTime: 2020-11-19 10:59:03
 Description: None
 '''
 import torch
@@ -128,7 +128,8 @@ class HSBlock_NEW(nn.Module):
         last_split = None
         channels = x.shape[1]
         assert channels == self.w*self.split, f'input channels({channels}) is not equal to w({self.w})*split({self.split})'
-        split_list.append(x[:, 0:self.w, :, :])
+        retfeature = x[:, 0:self.w, :, :]
+        # split_list.append(x[:, 0:self.w, :, :])
         for s in range(1, self.split):
             hc = int((2**(s)-1)/2**(s-1)*self.w)
             ops = nn.Sequential(
@@ -138,20 +139,17 @@ class HSBlock_NEW(nn.Module):
                 )
             if x.is_cuda:
                 ops = ops.to('cuda')
-            if last_split is None:
-                temp = ops(x[:, s*self.w:(s+1)*self.w, :, :])
-                x1, x2 = self._split(temp)
-                split_list.append(x1)
-                last_split = x2
-            else:
-                temp = torch.cat([last_split, x[:, s*self.w:(s+1)*self.w, :, :]], dim=1)
-                temp = ops(temp)
-                x1, x2 = self._split(temp)
-                del temp
-                split_list.append(x1)
-                last_split = x2
-        split_list.append(last_split)
-        return torch.cat(split_list, dim=1)
+            temp = torch.cat([last_split, x[:, s*self.w:(s+1)*self.w, :, :]], dim=1) if last_split is not None else x[:, s*self.w:(s+1)*self.w, :, :]
+            temp = ops(temp)
+            x1, x2 = self._split(temp)
+            del temp
+            retfeature = torch.cat([retfeature, x1], dim=1)
+            # split_list.append(x1)
+            last_split = x2
+        retfeature = torch.cat([retfeature, last_split], dim=1)
+        # split_list.append(last_split)
+        return retfeature
+        # return torch.cat(split_list, dim=1)
 
     def _split(self, x):
         channels = int(x.shape[1]/2)
