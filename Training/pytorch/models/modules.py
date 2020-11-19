@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-25 13:08:10
 LastEditors: TJUZQC
-LastEditTime: 2020-11-19 13:35:44
+LastEditTime: 2020-11-19 13:51:18
 Description: None
 '''
 import torch
@@ -220,16 +220,69 @@ class HSBlock(nn.Module):
         channels = int(x.shape[1]/2)
         return x[:, 0:channels, :, :], x[:, channels:, :, :]
 
+class HSBlock5(nn.Module):
+    def __init__(self, w: int, stride: int = 1) -> None:
+        super(HSBlock5, self).__init__()
+        self.w = w
+        self.channel = w*5
+        self.stride = stride
+        self.conv1 = nn.Sequential(
+            nn.Conv2d(w, w, kernel_size=3, padding=1, stride=self.stride),
+            nn.BatchNorm2d(w),
+            nn.ReLU(inplace=True)
+        )
+        self.conv2 = nn.Sequential(
+            nn.Conv2d(int(1.5*w), int(1.5*w), kernel_size=3, padding=1, stride=self.stride),
+            nn.BatchNorm2d(int(1.5*w)),
+            nn.ReLU(inplace=True)
+        )
+        self.conv3 = nn.Sequential(
+            nn.Conv2d(int(1.75*w), int(1.75*w), kernel_size=3, padding=1, stride=self.stride),
+            nn.BatchNorm2d(int(1.75*w)),
+            nn.ReLU(inplace=True)
+        )
+        self.conv4 = nn.Sequential(
+            nn.Conv2d(int(1.875*w), int(1.875*w), kernel_size=3, padding=1, stride=self.stride),
+            nn.BatchNorm2d(int(1.875*w)),
+            nn.ReLU(inplace=True)
+        )
+
+    def forward(self, x):
+        split_list = []
+        last_split = None
+        channels = x.shape[1]
+        assert channels == self.w * \
+            self.split, f'input channels({channels}) is not equal to w({self.w})*split({self.split})'
+        retfeature = x[:, 0:self.w, :, :]
+        temp = self.conv1(x[:, self.w:self.w*2, :, :])
+        x1, x2 = self._split(temp)
+        retfeature = torch.cat([retfeature, x1], dim=1)
+        temp = self.conv2(torch.cat([x2, x[:, self.w*2:self.w*3, :, :]], dim=1))
+        x1, x2 = self._split(temp)
+        retfeature = torch.cat([retfeature, x1], dim=1)
+        temp = self.conv3(torch.cat([x2, x[:, self.w*3:self.w*4, :, :]], dim=1))
+        x1, x2 = self._split(temp)
+        retfeature = torch.cat([retfeature, x1], dim=1)
+        temp = self.conv2(torch.cat([x2, x[:, self.w*4:self.w*5, :, :]], dim=1))
+        x1, x2 = self._split(temp)
+        retfeature = torch.cat([retfeature, x1], dim=1)
+        return retfeature
+        # return torch.cat(split_list, dim=1)
+
+    def _split(self, x):
+        channels = int(x.shape[1]/2)
+        return x[:, 0:channels, :, :], x[:, channels:, :, :]
+
 
 class HSBottleNeck(nn.Module):
-    def __init__(self, in_channels: int, out_channels: int, split: int, stride: int = 1) -> None:
+    def __init__(self, in_channels: int, out_channels: int, split: int=5, stride: int = 1) -> None:
         super(HSBottleNeck, self).__init__()
         self.w = max(2**(split-2), 1)
         self.residual_function = nn.Sequential(
             nn.Conv2d(in_channels, self.w*split, kernel_size=1, stride=stride),
             nn.BatchNorm2d(self.w*split),
             nn.ReLU(inplace=True),
-            HSBlock(self.w, split, stride),
+            HSBlock5(self.w, stride),
             nn.BatchNorm2d(self.w*split),
             nn.ReLU(inplace=True),
             nn.Conv2d(self.w*split, out_channels,
