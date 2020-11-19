@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-25 13:08:10
 LastEditors: TJUZQC
-LastEditTime: 2020-11-19 16:44:17
+LastEditTime: 2020-11-19 16:45:55
 Description: None
 '''
 import torch
@@ -225,7 +225,7 @@ class HSBottleNeck(nn.Module):
             nn.Conv2d(in_channels, self.w*split, kernel_size=1, stride=stride),
             nn.BatchNorm2d(self.w*split),
             nn.ReLU(inplace=True),
-            HSBlock(self.w, self.split, stride),
+            HSBlock(self.w, split, stride),
             nn.BatchNorm2d(self.w*split),
             nn.ReLU(inplace=True),
             nn.Conv2d(self.w*split, out_channels,
