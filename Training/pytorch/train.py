@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-26 10:26:51
 LastEditors: TJUZQC
-LastEditTime: 2020-11-19 13:29:59
+LastEditTime: 2020-11-19 13:31:05
 Description: None
 '''
 import argparse
@@ -258,6 +258,7 @@ if __name__ == '__main__':
               'fcn16s': FCN16s,
               'fcn32s': FCN32s,
               'fcn1s': FCN1s,
+              'hsunetold': HSU_Net_OLD,
               }
     net = network_getter.get(network, None)(
         n_channels=3, n_classes=conf['DATASET']['NUM_CLASSES'])
