@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-26 10:26:51
 LastEditors: TJUZQC
-LastEditTime: 2020-11-18 13:50:56
+LastEditTime: 2020-11-19 12:41:54
 Description: None
 '''
 import argparse
@@ -43,7 +43,9 @@ def train_net(net,
               img_scale=0.5,
               use_apex=False,
               optimizer='adam',
-              classes=2):
+              classes=2,
+              lr_scheduler='steplr',
+              lr_scheduler_cfgs:dict={'step_size':10}):
 
     dataset = BasicDataset(dir_img, dir_mask, img_scale, train=True, classes=classes)
     n_val = int(len(dataset) * val_percent)
@@ -84,6 +86,18 @@ def train_net(net,
     }
     optimizer = optimizers.get(optimizer, None)(
         net.parameters(), lr=lr, weight_decay=1e-8)
+    lr_scheduler_getter = {
+        'lambdalr': torch.optim.lr_scheduler.LambdaLR,
+        'multiplicativelr': torch.optim.lr_scheduler.MultiplicativeLR,
+        'steplr': torch.optim.lr_scheduler.StepLR,
+        'multisteplr': torch.optim.lr_scheduler.MultiStepLR,
+        'exponentiallr': torch.optim.lr_scheduler.ExponentialLR,
+        'cosineannealinglr': torch.optim.lr_scheduler.CosineAnnealingLR,
+        'reducelronplateau': torch.optim.lr_scheduler.ReduceLROnPlateau,
+        'cycliclr': torch.optim.lr_scheduler.CyclicLR,
+        'onecyclelr': torch.optim.lr_scheduler.OneCycleLR,
+    }
+    lr_scheduler = lr_scheduler_getter.get(lr_scheduler.lower(), None)(optimizer, **lr_scheduler_cfgs)
     if use_apex:
         try:
             from apex import amp
@@ -175,6 +189,7 @@ def train_net(net,
                             'masks/true', true_masks, global_step)
                         writer.add_images(
                             'masks/pred', torch.sigmoid(masks_pred) > 0.5, global_step)
+                lr_scheduler.step()
 
         if save_cp:
             try:
@@ -213,6 +228,8 @@ def get_args():
                         help='Automatic Mixed Precision')
     parser.add_argument('-o', '--optimizer', dest='optimizer',
                         type=str, default=conf['OPTIMIZER'], help='Optimizer type')
+    parser.add_argument('-ls', '--lr-scheduler', dest='lr_scheduler',
+                        type=str, default=conf['LR_SCHEDULER'], help='lr scheduler type')
 
     return parser.parse_args()
 
@@ -232,7 +249,7 @@ if __name__ == '__main__':
     #   - For N > 2 classes, use n_classes=N
 
     network = args.network.lower()
-    switch = {'unet': U_Net,
+    network_getter = {'unet': U_Net,
               'r2unet': R2U_Net,
               'attunet': AttU_Net,
               'r2attunet': R2AttU_Net,
@@ -242,11 +259,10 @@ if __name__ == '__main__':
               'fcn32s': FCN32s,
               'fcn1s': FCN1s,
               }
-    net = switch.get(network, None)(
+    net = network_getter.get(network, None)(
         n_channels=3, n_classes=conf['DATASET']['NUM_CLASSES'])
     assert net is not None, f'check your argument --network'
-    # net = AttU_Net(n_channels=3,n_classes=1)
-    # net = AttU_Net(n_channels=3, n_classes=1)
+    
     logging.info(f'Network:\n'
                  f'\t{net.n_channels} input channels\n'
                  f'\t{net.n_classes} output channels (classes)\n'
@@ -273,7 +289,9 @@ if __name__ == '__main__':
                   val_percent=args.val / 100,
                   use_apex=(args.use_apex == "True"),
                   optimizer=args.optimizer.lower(),
-                  classes=conf['DATASET']['NUM_CLASSES'])
+                  classes=conf['DATASET']['NUM_CLASSES'],
+                  lr_scheduler=args.lr_scheduler,
+                  lr_scheduler_cfgs=conf['LR_SCHEDULER_CFGS'])
     except KeyboardInterrupt:
         torch.save(net.state_dict(), 'INTERRUPTED.pth')
         logging.info('Saved interrupt')
