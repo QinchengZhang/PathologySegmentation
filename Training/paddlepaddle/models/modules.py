@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-11-17 11:58:53
 LastEditors: TJUZQC
-LastEditTime: 2020-11-18 13:14:19
+LastEditTime: 2020-11-19 16:40:00
 Description: None
 '''
 import paddle
@@ -53,7 +53,7 @@ class HSBlock(paddle.nn.Layer):
         self.channels = w*split
         self.split = split
         self.stride = stride
-        self.ops_list = []
+        self.ops_list = paddle.nn.LayerList()
         for s in range(1, self.split):
             hc = int((2**(s)-1)/2**(s-1)*self.w)
             self.ops_list.append(paddle.nn.Sequential(
@@ -63,25 +63,20 @@ class HSBlock(paddle.nn.Layer):
                 ))
 
     def forward(self, x):
-        split_list = []
         last_split = None
-        split_list.append(x[:, 0:self.w, :, :])
+        channels = x.shape[1]
+        assert channels == self.w * \
+            self.split, f'input channels({channels}) is not equal to w({self.w})*split({self.split})'
+        retfeature = x[:, 0:self.w, :, :]
         for s in range(1, self.split):
-            if last_split is None:
-                temp = self.ops_list[s-1](x[:, s*self.w:(s+1)*self.w, :, :])
-                x1, x2 = self._split(temp)
-                split_list.append(x1)
-                last_split = x2
-            else:
-                temp = paddle.concat(
-                    [last_split, x[:, s*self.w:(s+1)*self.w, :, :]], axis=1)
-                temp = self.ops_list[s-1](temp)
-                x1, x2 = self._split(temp)
-                split_list.append(x1)
-                last_split = x2
-        split_list.append(last_split)
+            temp = x[:, s*self.w:(s+1)*self.w, :, :] if last_split is None else paddle.concat([last_split, x[:, s*self.w:(s+1)*self.w, :, :]], axis=1)
+            temp = self.ops_list[s-1](temp)
+            x1, x2 = self._split(temp)
+            retfeature = paddle.concat([retfeature, x1], axis=1)
+            last_split = x2
+        retfeature = paddle.concat([retfeature, last_split], axis=1)
         del last_split
-        return paddle.concat(split_list, axis=1)
+        return retfeature
 
     def _split(self, x):
         channels = int(x.shape[1]/2)
@@ -89,7 +84,7 @@ class HSBlock(paddle.nn.Layer):
 
 
 class HSBottleNeck(paddle.nn.Layer):
-    def __init__(self, in_channels: int, out_channels: int, split: int, stride: int = 1) -> None:
+    def __init__(self, in_channels: int, out_channels: int, split: int=5, stride: int = 1) -> None:
         super(HSBottleNeck, self).__init__()
         self.w = max(2**(split-2), 1)
         self.residual_function = paddle.nn.Sequential(
