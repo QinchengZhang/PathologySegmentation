@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-25 13:08:10
 LastEditors: TJUZQC
-LastEditTime: 2020-11-19 13:53:08
+LastEditTime: 2020-11-19 13:55:00
 Description: None
 '''
 import torch
@@ -258,7 +258,7 @@ class HSBlock5(nn.Module):
         temp = self.conv3(torch.cat([x2, x[:, self.w*3:self.w*4, :, :]], dim=1))
         x1, x2 = self._split(temp)
         retfeature = torch.cat([retfeature, x1], dim=1)
-        temp = self.conv2(torch.cat([x2, x[:, self.w*4:self.w*5, :, :]], dim=1))
+        temp = self.conv4(torch.cat([x2, x[:, self.w*4:self.w*5, :, :]], dim=1))
         x1, x2 = self._split(temp)
         retfeature = torch.cat([retfeature, x1], dim=1)
         return retfeature
