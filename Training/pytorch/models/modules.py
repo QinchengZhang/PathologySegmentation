@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-25 13:08:10
 LastEditors: TJUZQC
-LastEditTime: 2020-11-19 13:51:18
+LastEditTime: 2020-11-19 13:53:08
 Description: None
 '''
 import torch
@@ -248,11 +248,6 @@ class HSBlock5(nn.Module):
         )
 
     def forward(self, x):
-        split_list = []
-        last_split = None
-        channels = x.shape[1]
-        assert channels == self.w * \
-            self.split, f'input channels({channels}) is not equal to w({self.w})*split({self.split})'
         retfeature = x[:, 0:self.w, :, :]
         temp = self.conv1(x[:, self.w:self.w*2, :, :])
         x1, x2 = self._split(temp)
