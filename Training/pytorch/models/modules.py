@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-25 13:08:10
 LastEditors: TJUZQC
-LastEditTime: 2020-11-20 13:42:36
+LastEditTime: 2020-11-20 16:58:15
 Description: None
 '''
 import torch
@@ -145,8 +145,8 @@ class HSBlock(nn.Module):
             self.conv_list.append(nn.Sequential(
                 nn.Conv2d(hc, hc, kernel_size=3,
                           padding=1, stride=self.stride),
-                nn.BatchNorm2d(hc),
-                nn.ReLU(inplace=True)
+                # nn.BatchNorm2d(hc),
+                # nn.ReLU(inplace=True)
             ))
 
     def forward(self, x):
