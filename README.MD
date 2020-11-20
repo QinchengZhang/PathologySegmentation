@@ -2,7 +2,7 @@
  * @Author: TJUZQC
  * @Date: 2020-09-27 12:40:56
  * @LastEditors: TJUZQC
- * @LastEditTime: 2020-11-20 14:02:31
+ * @LastEditTime: 2020-11-20 15:08:11
  * @Description: None
 -->
 # Pathology segmentation implement with PyTorch.
@@ -11,10 +11,10 @@
 **Segmentation Demo Result:**
 
 **对比模式**
-![Segmentation](http://qhax9tu5e.hb-bkt.clouddn.com/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20200927130059.png)
+![Segmentation](http://tjuzqc.top/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20200927130059.png)
 
 **合并模式**
-![Segmentation](http://qhax9tu5e.hb-bkt.clouddn.com/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20200927130120.png)
+![Segmentation](http://tjuzqc.top/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20200927130120.png)
 
 ---
 ## Dependencies
