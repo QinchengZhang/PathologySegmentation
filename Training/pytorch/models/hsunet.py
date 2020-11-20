@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-25 13:15:58
 LastEditors: TJUZQC
-LastEditTime: 2020-11-20 13:42:51
+LastEditTime: 2020-11-20 16:12:53
 Description: None
 '''
 import torch
@@ -31,20 +31,20 @@ class HSU_Net(nn.Module):
         self.Conv5 = HSBottleNeck(512, 1024, split)
 
         self.Up5 = up_conv(ch_in=1024,ch_out=512, bilinear=bilinear)
-        # self.Up_conv5 = conv_block(ch_in=1024, ch_out=512)
-        self.Up_conv5 = HSBottleNeck(1024, 512, split)
+        self.Up_conv5 = conv_block(ch_in=1024, ch_out=512)
+        # self.Up_conv5 = HSBottleNeck(1024, 512, split)
 
         self.Up4 = up_conv(ch_in=512,ch_out=256, bilinear=bilinear)
-        # self.Up_conv4 = conv_block(ch_in=512, ch_out=256)
-        self.Up_conv4 = HSBottleNeck(512, 256, split)
+        self.Up_conv4 = conv_block(ch_in=512, ch_out=256)
+        # self.Up_conv4 = HSBottleNeck(512, 256, split)
         
         self.Up3 = up_conv(ch_in=256,ch_out=128, bilinear=bilinear)
-        # self.Up_conv3 = conv_block(ch_in=256, ch_out=128)
-        self.Up_conv3 = HSBottleNeck(256, 128, split)
+        self.Up_conv3 = conv_block(ch_in=256, ch_out=128)
+        # self.Up_conv3 = HSBottleNeck(256, 128, split)
         
         self.Up2 = up_conv(ch_in=128,ch_out=64, bilinear=bilinear)
-        # self.Up_conv2 = conv_block(ch_in=128, ch_out=64)
-        self.Up_conv2 = HSBottleNeck(128, 64, split)
+        self.Up_conv2 = conv_block(ch_in=128, ch_out=64)
+        # self.Up_conv2 = HSBottleNeck(128, 64, split)
 
         self.Conv_1x1 = nn.Conv2d(64,n_classes,kernel_size=1,stride=1,padding=0)
 
