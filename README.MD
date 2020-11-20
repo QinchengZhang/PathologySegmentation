@@ -2,11 +2,11 @@
  * @Author: TJUZQC
  * @Date: 2020-09-27 12:40:56
  * @LastEditors: TJUZQC
- * @LastEditTime: 2020-11-17 15:18:28
+ * @LastEditTime: 2020-11-20 14:02:31
  * @Description: None
 -->
 # Pathology segmentation implement with PyTorch.
-## Network architecture: U-Net, Attention U-Net, R2 U-Net, R2 Attention U-Net, Capsule U-Net
+## Network architecture: U-Net, Attention U-Net, R2 U-Net, R2 Attention U-Net,  HSU-Net
 
 **Segmentation Demo Result:**
 
