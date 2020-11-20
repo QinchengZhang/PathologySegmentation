@@ -4,18 +4,19 @@
 @Autor: TJUZQC
 @Date: 2020-05-13 10:48:10
 LastEditors: TJUZQC
-LastEditTime: 2020-09-28 11:35:45
+LastEditTime: 2020-11-20 19:24:41
 '''
-import os
 import glob
+import os
 
+import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
-Image.MAX_IMAGE_PIXELS = None
 from tqdm import tqdm
 
-import cv2
+Image.MAX_IMAGE_PIXELS = None
+
 
 def __batch_resize(file_list, path_dst, start, end):
     if not os.path.exists(path_dst):
@@ -25,7 +26,7 @@ def __batch_resize(file_list, path_dst, start, end):
     if not os.path.exists(os.path.join(path_dst, 'masks')):
         os.mkdir(os.path.join(path_dst, 'masks'))
     print('getting start from {} to {}'.format(start, end))
-    pbar = tqdm(file_list[start : end])
+    pbar = tqdm(file_list[start: end])
     for name in pbar:
         pbar.set_description("Processing {}:".format(name))
         file_name = os.path.basename(name)

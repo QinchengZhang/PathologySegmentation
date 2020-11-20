@@ -6,10 +6,10 @@ LastEditors: TJUZQC
 LastEditTime: 2020-09-17 11:59:47
 Description: None
 '''
-from torchvision import transforms
-from PIL import Image, ImageOps, ImageChops
-import numpy as np
 import cv2
+import numpy as np
+from PIL import Image, ImageChops, ImageOps
+from torchvision import transforms
 
 
 class FlipOps(object):
@@ -41,7 +41,7 @@ class MirrorOps(object):
             return ImageOps.mirror(img), ImageOps.mirror(mask)
         else:
             return ImageOps.mirror(img)
-    
+
     def __str__(self):
         return self.name
 
@@ -91,6 +91,7 @@ class AffineOps(object):
 
     def __str__(self):
         return self.name
+
 
 class PaddingOps(object):
     def __init__(self, padding, fill=0, padding_mode='constant'):
@@ -148,12 +149,13 @@ class DoNothing(object):
     def __str__(self):
         return self.name
 
+
 class ResizeOps(object):
     def __init__(self, size):
         assert isinstance(size, tuple), f'argument type error!'
         self.size = size
         self.name = "basicOps.ResizeOps"
-    
+
     def __call__(self, img, mask=None):
         assert isinstance(img, Image.Image), f'argument type error!'
         if mask is not None:

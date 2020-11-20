@@ -3,17 +3,17 @@
 Author: TJUZQC
 Date: 2020-09-08 17:51:09
 LastEditors: TJUZQC
-LastEditTime: 2020-09-29 00:17:36
+LastEditTime: 2020-11-20 19:25:00
 Description: None
 '''
-import multiresolutionimageinterface as mir
-import cv2
-import os
 import glob
-import numpy as np
-from matplotlib import pyplot as plt
+import os
 import threading
 
+import cv2
+import multiresolutionimageinterface as mir
+import numpy as np
+from matplotlib import pyplot as plt
 
 reader = mir.MultiResolutionImageReader()
 
@@ -45,9 +45,12 @@ def makeMask(pathlist, start, end=None):
         annotation_mask.convert(annotation_list, output_path, img.getDimensions(
         ), img.getSpacing(), label_map, conversion_order)
 
-pathlist = glob.glob('F:\DATASET\Beijing-small_cell_lung_cancer-pathology\\2020-01-20 10.39.42')
+
+pathlist = glob.glob(
+    'F:\DATASET\Beijing-small_cell_lung_cancer-pathology\\2020-01-20 10.39.42')
 # num = int(len(pathlist)/4)
-makeMask(['F:\DATASET\Beijing-small_cell_lung_cancer-pathology\\2020-01-20 10.39.42'], 0)
+makeMask(
+    ['F:\DATASET\Beijing-small_cell_lung_cancer-pathology\\2020-01-20 10.39.42'], 0)
 # threads = []
 # t1 = threading.Thread(target=makeMask, args=(pathlist, 0, num))
 # threads.append(t1)
@@ -64,4 +67,3 @@ makeMask(['F:\DATASET\Beijing-small_cell_lung_cancer-pathology\\2020-01-20 10.39
 #     t.start()
 # t.join()
 # print('ok')
-

@@ -6,16 +6,16 @@ LastEditors: TJUZQC
 LastEditTime: 2020-09-27 17:26:24
 Description: None
 '''
-import multiresolutionimageinterface as mir
-import cv2
-import os
 import glob
-import numpy as np
-from matplotlib import pyplot as plt
+import os
 import threading
-from libtiff import TIFF
-from PIL import Image
 
+import cv2
+import multiresolutionimageinterface as mir
+import numpy as np
+from libtiff import TIFF
+from matplotlib import pyplot as plt
+from PIL import Image
 
 
 # 从xml标注中得到一个Annotation的边界信息，所得边界比真实边界大200px
@@ -36,6 +36,8 @@ def getPositionAndSize(annotation):
     return int(X_min)-200, int(Y_min)-200, int(X_max - X_min)+400, int(Y_max - Y_min) + 400
 
 # 切patch
+
+
 def __getPatch(pathlist, start, end):
     print('getting start from {} to {}'.format(start, end))
     pathlist = pathlist[start:end] if end != -1 else pathlist[start:]
@@ -95,17 +97,19 @@ def __getPatch(pathlist, start, end):
                 path, 'patch', 'masks', os.path.splitext(os.path.basename(img_name))[0]+'-{}.png'.format(idx)))
             del patch_mask
 
+
 def getPatch(pathlist, num_works):
     num = int(len(pathlist)/num_works) if int(len(pathlist)/num_works) > 1 else 1
     threads = []
     for work_idx in range(num_works):
-        
-        threads.append(threading.Thread(target=__getPatch, args=(pathlist, work_idx*num, (work_idx+1)*num)))
+
+        threads.append(threading.Thread(target=__getPatch, args=(
+            pathlist, work_idx*num, (work_idx+1)*num)))
     for t in threads:
         t.setDaemon(True)
         t.start()
     t.join()
-    print('All threads is done!')  
+    print('All threads is done!')
 
 
 if __name__ == '__main__':

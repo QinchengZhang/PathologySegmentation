@@ -12,10 +12,12 @@ import glob
 import os
 
 from numpy import array
-from PIL.Image import open as Iopen, fromarray
+from PIL.Image import fromarray
+from PIL.Image import open as Iopen
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFileDialog
+
 import evaluate
 
 
@@ -252,9 +254,10 @@ class Ui_MainWindow(object):
         try:
             img = Iopen(os.path.join(path, name))
             self.data[flag] = array(img)
-            if (flag == 'GT' and self.data['pred'] is not None) or (flag=='pred' and self.data['GT'] is not None):
+            if (flag == 'GT' and self.data['pred'] is not None) or (flag == 'pred' and self.data['GT'] is not None):
                 dice = evaluate.dice_coeff(self.data['pred'], self.data['GT'])
-                acc = evaluate.pixel_accuracy(self.data['pred'], self.data['GT'])
+                acc = evaluate.pixel_accuracy(
+                    self.data['pred'], self.data['GT'])
                 self.dice.setText('{}'.format(dice.item()))
                 self.accuracy.setText('{}'.format(acc.item()))
             self.progressBar.setValue(self.current_image_mark+1)
@@ -305,4 +308,3 @@ class Ui_MainWindow(object):
             self.Last.setEnabled(True)
         else:
             self.Last.setEnabled(False)
-

@@ -6,13 +6,14 @@ LastEditors: TJUZQC
 LastEditTime: 2020-09-02 14:58:05
 Description: None
 '''
-import openslide
-import os
-from PIL import Image
 import glob
-from matplotlib import pyplot as plt
+import os
 import shutil
+
+import openslide
 from libtiff import TIFF
+from matplotlib import pyplot as plt
+from PIL import Image
 
 print(os.getcwd())
 data_path = 'G:\\TJUZQC\\DataSet\\Beijing-no_small_cell_lung_cancer-pathology'

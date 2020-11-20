@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-25 13:08:10
 LastEditors: TJUZQC
-LastEditTime: 2020-11-20 16:58:15
+LastEditTime: 2020-11-20 19:20:43
 Description: None
 '''
 import torch
@@ -175,7 +175,7 @@ class HSBlock(nn.Module):
 
 
 class HSBottleNeck(nn.Module):
-    def __init__(self, in_channels: int, out_channels: int, split: int=5, stride: int = 1) -> None:
+    def __init__(self, in_channels: int, out_channels: int, split: int = 5, stride: int = 1) -> None:
         super(HSBottleNeck, self).__init__()
         self.w = max(2**(split-2), 1)
         self.residual_function = nn.Sequential(

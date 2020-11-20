@@ -1,17 +1,19 @@
-import sys
-import os
-import spams
-import numpy as np
 import math
-from sklearn import preprocessing
-from multiprocessing import Pool
-from functools import partial
+import os
 import signal
+import sys
+from functools import partial
+from multiprocessing import Pool
 
+import numpy as np
+import spams
 from PIL import Image
+from sklearn import preprocessing
+
 Image.MAX_IMAGE_PIXELS = None
 
 import warnings
+
 warnings.simplefilter('ignore', Image.DecompressionBombWarning)
 
 
