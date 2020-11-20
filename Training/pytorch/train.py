@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-26 10:26:51
 LastEditors: TJUZQC
-LastEditTime: 2020-11-19 13:31:05
+LastEditTime: 2020-11-20 13:48:01
 Description: None
 '''
 import argparse
@@ -19,8 +19,7 @@ from tqdm import tqdm
 
 from evaluation import eval_net
 import sys
-# from unet import U_Net, R2U_Net, AttU_Net, R2AttU_Net, init_weights
-from models import U_Net, R2AttU_Net, R2U_Net, AttU_Net, HSU_Net, FCN1s, FCN8s, FCN16s, FCN32s,init_weights, HSU_Net_OLD
+from models import ChooseModel, init_weights
 
 from torch.utils.tensorboard import SummaryWriter
 from utils.dataset import BasicDataset
@@ -247,20 +246,7 @@ if __name__ == '__main__':
     #   - For 1 class and background, use n_classes=1
     #   - For 2 classes, use n_classes=1
     #   - For N > 2 classes, use n_classes=N
-
-    network = args.network.lower()
-    network_getter = {'unet': U_Net,
-              'r2unet': R2U_Net,
-              'attunet': AttU_Net,
-              'r2attunet': R2AttU_Net,
-              'hsunet': HSU_Net,
-              'fcn8s': FCN8s,
-              'fcn16s': FCN16s,
-              'fcn32s': FCN32s,
-              'fcn1s': FCN1s,
-              'hsunetold': HSU_Net_OLD,
-              }
-    net = network_getter.get(network, None)(
+    net = ChooseModel(network)(
         n_channels=3, n_classes=conf['DATASET']['NUM_CLASSES'])
     assert net is not None, f'check your argument --network'
     

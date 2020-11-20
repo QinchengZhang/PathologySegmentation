@@ -13,7 +13,7 @@ from evaluation import *
 import torch.nn.functional as F
 import sys
 # from unet import U_Net, R2U_Net, AttU_Net, R2AttU_Net, init_weights
-from models import U_Net, R2AttU_Net, R2U_Net, AttU_Net, HSU_Net, FCN1s, FCN8s, FCN16s, FCN32s, HSU_Net_OLD
+from models import ChooseModel
 
 from torch.utils.tensorboard import SummaryWriter
 from utils.dataset import BasicDataset
@@ -176,18 +176,7 @@ if __name__ == '__main__':
     #   - For N > 2 classes, use n_classes=N
 
     network = args.network.lower()
-    switch = {'unet': U_Net,
-              'r2unet': R2U_Net,
-              'attunet': AttU_Net,
-              'r2attunet': R2AttU_Net,
-              'hsunet': HSU_Net,
-              'fcn8s': FCN8s,
-              'fcn16s': FCN16s,
-              'fcn32s': FCN32s,
-              'fcn1s': FCN1s,
-              'hsunetold': HSU_Net_OLD,
-              }
-    net = switch.get(network, None)(
+    net = ChooseModel(network)(
         n_channels=3, n_classes=conf['DATASET']['NUM_CLASSES'])
     assert net is not None, f'check your argument --network'
     # net = AttU_Net(n_channels=3,n_classes=1)

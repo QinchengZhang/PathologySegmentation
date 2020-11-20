@@ -9,7 +9,7 @@ import torchsummary as summary
 from PIL import Image
 from torchvision import transforms
 
-from models import AttU_Net, HSU_Net, R2AttU_Net, R2U_Net, U_Net, HSU_Net_OLD
+from models import ChooseModel
 from utils.data_vis import plot_img_and_mask
 from utils.dataset import BasicDataset
 
@@ -108,14 +108,7 @@ if __name__ == "__main__":
     out_files = get_output_filenames(args)
 
     network = args.network.lower()
-    switch = {'unet': U_Net,
-              'r2unet': R2U_Net,
-              'attunet': AttU_Net,
-              'r2attunet': R2AttU_Net,
-              'hsunet': HSU_Net,
-              'hsunetold': HSU_Net_OLD,
-             }
-    net = switch.get(network, None)(n_channels=3,n_classes=1)
+    net = ChooseModel(network)(n_channels=3,n_classes=1)
     assert net is not None, f'check your argument --network'
 
     logging.info("Loading model {}".format(args.model))

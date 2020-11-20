@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-25 13:08:10
 LastEditors: TJUZQC
-LastEditTime: 2020-11-19 16:45:55
+LastEditTime: 2020-11-20 13:42:36
 Description: None
 '''
 import torch
@@ -132,49 +132,6 @@ class Attention_block(nn.Module):
         return x*psi
 
 
-class HSBlock_NEW(nn.Module):
-    def __init__(self, w: int, split: int, stride: int = 1) -> None:
-        super(HSBlock_NEW, self).__init__()
-        self.w = w
-        self.split = split
-        self.stride = stride
-
-    def forward(self, x):
-        split_list = []
-        last_split = None
-        channels = x.shape[1]
-        assert channels == self.w * \
-            self.split, f'input channels({channels}) is not equal to w({self.w})*split({self.split})'
-        retfeature = x[:, 0:self.w, :, :]
-        # split_list.append(x[:, 0:self.w, :, :])
-        for s in range(1, self.split):
-            hc = int((2**(s)-1)/2**(s-1)*self.w)
-            ops = nn.Sequential(
-                nn.Conv2d(hc, hc, kernel_size=3,
-                          padding=1, stride=self.stride),
-                nn.BatchNorm2d(hc),
-                nn.ReLU(inplace=True)
-            )
-            if x.is_cuda:
-                ops = ops.to('cuda')
-            temp = torch.cat([last_split, x[:, s*self.w:(s+1)*self.w, :, :]],
-                             dim=1) if last_split is not None else x[:, s*self.w:(s+1)*self.w, :, :]
-            temp = ops(temp)
-            x1, x2 = self._split(temp)
-            del temp
-            retfeature = torch.cat([retfeature, x1], dim=1)
-            # split_list.append(x1)
-            last_split = x2
-        retfeature = torch.cat([retfeature, last_split], dim=1)
-        # split_list.append(last_split)
-        return retfeature
-        # return torch.cat(split_list, dim=1)
-
-    def _split(self, x):
-        channels = int(x.shape[1]/2)
-        return x[:, 0:channels, :, :], x[:, channels:, :, :]
-
-
 class HSBlock(nn.Module):
     def __init__(self, w: int, split: int, stride: int = 1) -> None:
         super(HSBlock, self).__init__()
@@ -226,35 +183,6 @@ class HSBottleNeck(nn.Module):
             nn.BatchNorm2d(self.w*split),
             nn.ReLU(inplace=True),
             HSBlock(self.w, split, stride),
-            nn.BatchNorm2d(self.w*split),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(self.w*split, out_channels,
-                      kernel_size=1, stride=stride),
-            nn.BatchNorm2d(out_channels)
-        )
-        self.shortcut = nn.Sequential()
-        if stride != 1 or in_channels != out_channels:
-            self.shortcut = nn.Sequential(
-                nn.Conv2d(in_channels, out_channels, stride=stride,
-                          kernel_size=1, bias=False),
-                nn.BatchNorm2d(out_channels)
-            )
-
-    def forward(self, x):
-        residual = self.residual_function(x)
-        shortcut = self.shortcut(x)
-        return nn.ReLU(inplace=True)(residual + shortcut)
-
-
-class HSBottleNeck_NEW(nn.Module):
-    def __init__(self, in_channels: int, out_channels: int, split: int, stride: int = 1) -> None:
-        super(HSBottleNeck_NEW, self).__init__()
-        self.w = max(2**(split-2), 1)
-        self.residual_function = nn.Sequential(
-            nn.Conv2d(in_channels, self.w*split, kernel_size=1, stride=stride),
-            nn.BatchNorm2d(self.w*split),
-            nn.ReLU(inplace=True),
-            HSBlock_NEW(self.w, split, stride),
             nn.BatchNorm2d(self.w*split),
             nn.ReLU(inplace=True),
             nn.Conv2d(self.w*split, out_channels,

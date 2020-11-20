@@ -3,10 +3,11 @@
 Author: TJUZQC
 Date: 2020-10-25 13:47:32
 LastEditors: TJUZQC
-LastEditTime: 2020-10-25 13:49:18
+LastEditTime: 2020-11-20 13:47:16
 Description: None
 '''
 from torch.nn import init
+from . import *
 
 def init_weights(net, init_type='normal', gain=0.02):
     def init_func(m):
@@ -30,3 +31,16 @@ def init_weights(net, init_type='normal', gain=0.02):
 
     print('initialize network with %s' % init_type)
     net.apply(init_func)
+
+def ChooseModel(model_name:str):
+    switch = {'unet': U_Net,
+              'r2unet': R2U_Net,
+              'attunet': AttU_Net,
+              'r2attunet': R2AttU_Net,
+              'hsunet': HSU_Net,
+              'fcn8s': FCN8s,
+              'fcn16s': FCN16s,
+              'fcn32s': FCN32s,
+              'fcn1s': FCN1s,
+              }
+    return switch.get(model_name, None)
