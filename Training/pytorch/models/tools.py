@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-25 13:47:32
 LastEditors: TJUZQC
-LastEditTime: 2020-11-20 13:47:16
+LastEditTime: 2020-11-20 15:28:35
 Description: None
 '''
 from torch.nn import init
@@ -38,9 +38,9 @@ def ChooseModel(model_name:str):
               'attunet': AttU_Net,
               'r2attunet': R2AttU_Net,
               'hsunet': HSU_Net,
-              'fcn8s': FCN8s,
-              'fcn16s': FCN16s,
-              'fcn32s': FCN32s,
-              'fcn1s': FCN1s,
+            #   'fcn8s': FCN8s,
+            #   'fcn16s': FCN16s,
+            #   'fcn32s': FCN32s,
+            #   'fcn1s': FCN1s,
               }
     return switch.get(model_name, None)
