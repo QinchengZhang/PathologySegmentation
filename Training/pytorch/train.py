@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-26 10:26:51
 LastEditors: TJUZQC
-LastEditTime: 2020-11-20 13:48:01
+LastEditTime: 2020-11-20 15:24:57
 Description: None
 '''
 import argparse
@@ -239,7 +239,8 @@ if __name__ == '__main__':
     args = get_args()
     device = torch.device('cuda' if torch.cuda.is_available() and conf['DEVICE'].lower() == 'cuda' else 'cpu')
     logging.info(f'Using device {device}')
-
+    
+    network = args.network.lower()
     # Change here to adapt to your data
     # n_channels=3 for RGB images
     # n_classes is the number of probabilities you want to get per pixel
