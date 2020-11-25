@@ -2,7 +2,7 @@
  * @Author: TJUZQC
  * @Date: 2020-09-27 12:40:56
  * @LastEditors: TJUZQC
- * @LastEditTime: 2020-11-25 11:34:35
+ * @LastEditTime: 2020-11-25 11:38:38
  * @Description: None
 -->
 # Pathology segmentation implement with PyTorch.
