@@ -13,12 +13,13 @@
 # limitations under the License.
 
 import argparse
+import os
 
 import paddle
 
-from paddleseg.cvlibs import manager, Config
-from paddleseg.utils import get_sys_env, logger
 from paddleseg.core import train
+from paddleseg.cvlibs import Config, manager
+from paddleseg.utils import get_sys_env, logger
 
 
 def parse_args():
@@ -119,21 +120,29 @@ def main(args):
     msg += str(cfg)
     msg += '------------------------------------------------'
     logger.info(msg)
-
-    train(
-        cfg.model,
-        train_dataset,
-        val_dataset=val_dataset,
-        optimizer=cfg.optimizer,
-        save_dir=args.save_dir,
-        iters=cfg.iters,
-        batch_size=cfg.batch_size,
-        resume_model=args.resume_model,
-        save_interval=args.save_interval,
-        log_iters=args.log_iters,
-        num_workers=args.num_workers,
-        use_vdl=args.use_vdl,
-        losses=losses)
+    try:
+        train(
+            cfg.model,
+            train_dataset,
+            val_dataset=val_dataset,
+            optimizer=cfg.optimizer,
+            save_dir=args.save_dir,
+            iters=cfg.iters,
+            batch_size=cfg.batch_size,
+            resume_model=args.resume_model,
+            save_interval=args.save_interval,
+            log_iters=args.log_iters,
+            num_workers=args.num_workers,
+            use_vdl=args.use_vdl,
+            losses=losses)
+    except KeyboardInterrupt:
+        current_save_dir = 'interrupted_model'
+        if not os.path.isdir(current_save_dir):
+            os.makedirs(current_save_dir)
+        paddle.save(cfg.model.state_dict(),
+                    os.path.join(current_save_dir, 'model.pdparams'))
+        paddle.save(cfg.optimizer.state_dict(),
+                    os.path.join(current_save_dir, 'model.pdopt'))
 
 
 if __name__ == '__main__':
