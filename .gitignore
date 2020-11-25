@@ -12,3 +12,5 @@ checkpoints*/
 *.pdmodel
 runs/*
 */__pycache__
+.history
+saved_model/

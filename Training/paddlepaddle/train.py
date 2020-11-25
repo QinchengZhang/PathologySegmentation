@@ -1,81 +1,141 @@
-# -*- coding: utf-8 -*-
-'''
-Author: TJUZQC
-Date: 2020-11-17 12:40:20
-LastEditors: TJUZQC
-LastEditTime: 2020-11-18 11:46:38
-Description: None
-'''
+# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import argparse
+
 import paddle
-from paddle.fluid.layers.nn import scale
-from models import HSU_Net
-from utils import *
-from paddle.static import InputSpec
 
-# paddle.set_device('cpu')
-num_classes = 1
-network = HSU_Net()
-model = paddle.Model(network)
-model.summary((-1, 3, 512, 512))
+from paddleseg.cvlibs import manager, Config
+from paddleseg.utils import get_sys_env, logger
+from paddleseg.core import train
 
-train_dataset = SegDataset("F:/DATASET/Beijing-small_cell_lung_cancer-pathology/imgs_color_normalized",
-                           "F:/DATASET/Beijing-small_cell_lung_cancer-pathology/masks", scale=0.5) # 训练数据集
-val_dataset = SegDataset("F:/DATASET/Beijing-small_cell_lung_cancer-pathology/test_images",
-                         "F:/DATASET/Beijing-small_cell_lung_cancer-pathology/test_masks", train=False, scale=0.5) # 验证数据集
 
-train_loader = paddle.io.DataLoader(train_dataset, places=paddle.CPUPlace(), batch_size=1, shuffle=True)
-val_loader = paddle.io.DataLoader(val_dataset, places=paddle.CPUPlace(), batch_size=1, shuffle=False)
-network.train()
+def parse_args():
+    parser = argparse.ArgumentParser(description='Model training')
+    # params of training
+    parser.add_argument(
+        "--config", dest="cfg", help="The config file.", default=None, type=str)
+    parser.add_argument(
+        '--iters',
+        dest='iters',
+        help='iters for training',
+        type=int,
+        default=None)
+    parser.add_argument(
+        '--batch_size',
+        dest='batch_size',
+        help='Mini batch size of one gpu or cpu',
+        type=int,
+        default=None)
+    parser.add_argument(
+        '--learning_rate',
+        dest='learning_rate',
+        help='Learning rate',
+        type=float,
+        default=None)
+    parser.add_argument(
+        '--save_interval',
+        dest='save_interval',
+        help='How many iters to save a model snapshot once during training.',
+        type=int,
+        default=1000)
+    parser.add_argument(
+        '--resume_model',
+        dest='resume_model',
+        help='The path of resume model',
+        type=str,
+        default=None)
+    parser.add_argument(
+        '--save_dir',
+        dest='save_dir',
+        help='The directory for saving the model snapshot',
+        type=str,
+        default='./output')
+    parser.add_argument(
+        '--num_workers',
+        dest='num_workers',
+        help='Num workers for data loader',
+        type=int,
+        default=0)
+    parser.add_argument(
+        '--do_eval',
+        dest='do_eval',
+        help='Eval while training',
+        action='store_true')
+    parser.add_argument(
+        '--log_iters',
+        dest='log_iters',
+        help='Display logging information at every log_iters',
+        default=10,
+        type=int)
+    parser.add_argument(
+        '--use_vdl',
+        dest='use_vdl',
+        help='Whether to record the data to VisualDL during training',
+        action='store_true')
 
-optim = paddle.optimizer.RMSProp(learning_rate=0.001,
-                                 rho=0.9,
-                                 momentum=0.0,
-                                 epsilon=1e-07,
-                                 centered=False,
-                                 parameters=model.parameters())
-# loss_func = paddle.nn.BCEWithLogitsLoss()
+    return parser.parse_args()
 
-# for i in range(5):
-#     for batch_id, data in enumerate(train_loader()):
-#         x_data = data[0]            # 训练数据
-#         y_data = data[1]            # 训练数据标签
-#         x_data = x_data.astype('float32')
-#         y_data = y_data.astype('float32')
-#         print(x_data.dtype, y_data.dtype)
-#         predicts = network(x_data)    # 预测结果
-#         # print(predicts)
 
-#         # 计算损失 等价于 prepare 中loss的设置
-#         loss = loss_func(predicts, y_data)
+def main(args):
+    env_info = get_sys_env()
+    info = ['{}: {}'.format(k, v) for k, v in env_info.items()]
+    info = '\n'.join(['', format('Environment Information', '-^48s')] + info +
+                     ['-' * 48])
+    logger.info(info)
 
-#         # 计算准确率 等价于 prepare 中metrics的设置
-#         m_iou, _, _ = paddle.metric.mean_iou(predicts.astype('int32'), y_data.astype('int32'), 1)
-#         # print(m_iou)
+    place = 'gpu' if env_info['Paddle compiled with cuda'] and env_info[
+        'GPUs used'] else 'cpu'
 
-#         # 下面的反向传播、打印训练信息、更新参数、梯度清零都被封装到 Model.fit() 中
+    paddle.set_device(place)
+    if not args.cfg:
+        raise RuntimeError('No configuration file specified.')
 
-#         # 反向传播
-#         loss.backward()
+    cfg = Config(
+        args.cfg,
+        learning_rate=args.learning_rate,
+        iters=args.iters,
+        batch_size=args.batch_size)
 
-#         if (batch_id+1) % 5 == 0:
-#             print("epoch: {}, batch_id: {}, loss is: {}, acc is: {}".format(i, batch_id, loss.numpy(), m_iou.numpy()))
+    train_dataset = cfg.train_dataset
+    if not train_dataset:
+        raise RuntimeError(
+            'The training dataset is not specified in the configuration file.')
+    val_dataset = cfg.val_dataset if args.do_eval else None
+    losses = cfg.loss
 
-#         # 更新参数
-#         optim.step()
+    msg = '\n---------------Config Information---------------\n'
+    msg += str(cfg)
+    msg += '------------------------------------------------'
+    logger.info(msg)
 
-#         # 梯度清零
-#         optim.clear_grad()
-input = InputSpec([None, 3, 512, 512], 'float32', 'x')
-label = InputSpec([None, 1, 512, 512], 'int64', 'label')
-model.prepare(optim, paddle.nn.BCEWithLogitsLoss()) 
-# model.load('E:/WorkSpaces/PythonWorkSpace/PathologySegmentation/Training/paddlepaddle/checkpoints_WSI/train/final.pdparams')
-# model.save('E:/WorkSpaces/PythonWorkSpace/PathologySegmentation/Training/paddlepaddle/checkpoints_WSI/test', training=False)
-model.fit(train_dataset,
-          val_dataset,
-          epochs=1,
-          batch_size=1,
-          verbose=1,
-          save_dir="E:/WorkSpaces/PythonWorkSpace/PathologySegmentation/Training/paddlepaddle/checkpoints_WSI",
-          num_workers=8)
-# model.load('E:/WorkSpaces/PythonWorkSpace/PathologySegmentation/Training/paddlepaddle/checkpoints_WSI/train/final.pdparams')
-model.save('E:/WorkSpaces/PythonWorkSpace/PathologySegmentation/Training/paddlepaddle/checkpoints_WSI/test', training=False)
+    train(
+        cfg.model,
+        train_dataset,
+        val_dataset=val_dataset,
+        optimizer=cfg.optimizer,
+        save_dir=args.save_dir,
+        iters=cfg.iters,
+        batch_size=cfg.batch_size,
+        resume_model=args.resume_model,
+        save_interval=args.save_interval,
+        log_iters=args.log_iters,
+        num_workers=args.num_workers,
+        use_vdl=args.use_vdl,
+        losses=losses)
+
+
+if __name__ == '__main__':
+    args = parse_args()
+    main(args)
