@@ -208,7 +208,7 @@ class Config(object):
                 if key == 'types':
                     self._losses['types'] = []
                     for item in args['types']:
-                        if not (isinstance(item['ignore_index'], str) and item['ignore_index'].lower() == 'false') or 'ignore_index' in item:
+                        if 'ignore_index' in item:
                             item['ignore_index'] = self.train_dataset.ignore_index
                         self._losses['types'].append(self._load_object(item))
                 else:
