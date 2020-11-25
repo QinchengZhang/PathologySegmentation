@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-11-22 14:57:05
 LastEditors: TJUZQC
-LastEditTime: 2020-11-25 13:46:54
+LastEditTime: 2020-11-25 14:09:09
 Description: None
 '''
 # Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
@@ -20,10 +20,10 @@ Description: None
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .dataset import Dataset
 from .ade import ADE20K
 from .breast_cancer import BreastCancer
 from .cityscapes import Cityscapes
-from .dataset import Dataset
 from .optic_disc_seg import OpticDiscSeg
 from .remotesensing import RemoteSensing
 from .voc import PascalVOC
