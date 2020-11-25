@@ -47,7 +47,7 @@
 > 损失函数
 >  * 参数
 >     * types : 损失函数列表
->       * type : 损失函数类型，目前只支持CrossEntropyLoss
+>       * type : 损失函数类型，目前支持CrossEntropyLoss, BCEWithLogitsLoss, BCELoss
 >     * coef : 对应损失函数列表的系数列表
 
 ----

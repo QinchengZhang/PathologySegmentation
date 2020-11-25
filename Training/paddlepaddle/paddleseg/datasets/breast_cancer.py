@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 '''
 Author: TJUZQC
-Date: 2020-11-24 16:18:01
+Date: 2020-11-25 13:42:40
 LastEditors: TJUZQC
-LastEditTime: 2020-11-25 13:46:28
+LastEditTime: 2020-11-25 13:46:04
 Description: None
 '''
-
 import os
 import glob
 
@@ -16,16 +15,16 @@ from paddleseg.transforms import Compose
 
 
 @manager.DATASETS.add_component
-class RemoteSensing(Dataset):
+class BreastCancer(Dataset):
     """
-    RemoteSensing dataset `https://www.datafountain.cn/competitions/475/datasets`.
+    BreastCancer dataset `https://www.kaggle.com/andrewmvd/breast-cancer-cell-segmentation?rvi=1`.
     The folder structure is as follow:
 
         RemoteSensing
         |
-        |--img_train
+        |--Images
         |
-        |--lab_train
+        |--Masks
         |
         |--train_list.txt
         |
@@ -33,8 +32,8 @@ class RemoteSensing(Dataset):
 
     Args:
         transforms (list): Transforms for image.
-        dataset_root (str): RemoteSensing dataset directory.
-        mode (str): Which part of dataset to use. it is one of ('train', 'val', 'testA', 'testB'). Default: 'train'.
+        dataset_root (str): BreastCancer dataset directory.
+        mode (str): Which part of dataset to use. it is one of ('train', 'val'). Default: 'train'.
     """
 
     def __init__(self, transforms, dataset_root, mode='train'):
@@ -42,12 +41,12 @@ class RemoteSensing(Dataset):
         self.transforms = Compose(transforms)
         self.file_list = list()
         self.mode = mode if mode in ['train', 'val'] else 'test'
-        self.num_classes = 7
+        self.num_classes = 2
         self.ignore_index = 255
 
-        if mode not in ['train', 'val', 'testA', 'testB']:
+        if mode not in ['train', 'val']:
             raise ValueError(
-                "mode should be 'train', 'val', 'testA' or 'testB', but got {}.".format(
+                "mode should be 'train' or 'val', but got {}.".format(
                     mode))
 
         if self.transforms is None:
@@ -63,17 +62,5 @@ class RemoteSensing(Dataset):
                 "The dataset is not Found or the folder structure is nonconfoumance."
             )
 
-        # label_files = sorted(
-        #     glob.glob(
-        #         os.path.join(label_dir, mode, '*',
-        #                      '*_gtFine_labelTrainIds.png')))
-        # img_files = sorted(
-        #     glob.glob(os.path.join(img_dir, mode, '*', '*_leftImg8bit.png')))
-        if self.mode != 'test':
-            self.file_list = [img_lab_path.strip().split(' ')
-                              for img_lab_path in list_file.readlines()]
-
-        else:
-            self.file_list = [[
-                img_path.strip(), ''
-            ] for img_path in list_file.readlines()]
+        self.file_list = [img_lab_path.strip().split(' ')
+                          for img_lab_path in list_file.readlines()]

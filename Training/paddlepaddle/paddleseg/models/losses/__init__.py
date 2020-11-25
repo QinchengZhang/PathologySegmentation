@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+'''
+Author: TJUZQC
+Date: 2020-11-25 10:05:57
+LastEditors: TJUZQC
+LastEditTime: 2020-11-25 13:41:33
+Description: None
+'''
 # Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,4 +20,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .bce_loss import BCELoss
+from .bce_with_logits_loss import BCEWithLogitsLoss
 from .cross_entroy_loss import CrossEntropyLoss
