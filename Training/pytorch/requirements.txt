@@ -12,3 +12,5 @@ torch>=1.1.0
 torchvision>=0.3.0
 tqdm>=4.42.1
 openslide>=1.1.1
+paddlepaddle >= 2.0.0rc
+visualdl >= 2.0.4
