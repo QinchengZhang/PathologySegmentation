@@ -41,7 +41,7 @@ def predict_img(net,
         tf = transforms.Compose(
             [
                 transforms.ToPILImage(),
-                transforms.Resize((full_img.size[1],full_img.size[0])),
+                transforms.Resize((full_img.size[1], full_img.size[0])),
                 transforms.ToTensor()
             ]
         )
@@ -56,7 +56,8 @@ def predict_img(net,
 def get_args():
     parser = argparse.ArgumentParser(description='Predict masks from input images',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--network', '-w', metavar='NETWORK', type=str, default='UNet', help='network type', dest='network')
+    parser.add_argument('--network', '-w', metavar='NETWORK',
+                        type=str, default='UNet', help='network type', dest='network')
     parser.add_argument('--model', '-m', default='MODEL.pth',
                         metavar='FILE',
                         help="Specify the file in which the model is stored")
@@ -90,7 +91,8 @@ def get_output_filenames(args):
             pathsplit = os.path.splitext(f)
             out_files.append("{}_OUT{}".format(pathsplit[0], pathsplit[1]))
     elif len(in_files) != len(args.output):
-        logging.error("Input files and output files are not of the same length")
+        logging.error(
+            "Input files and output files are not of the same length")
         raise SystemExit()
     else:
         out_files = args.output
@@ -108,7 +110,7 @@ if __name__ == "__main__":
     out_files = get_output_filenames(args)
 
     network = args.network.lower()
-    net = ChooseModel(network)(n_channels=3,n_classes=1)
+    net = ChooseModel(network)(n_channels=3, n_classes=1)
     assert net is not None, f'check your argument --network'
 
     logging.info("Loading model {}".format(args.model))
@@ -138,5 +140,6 @@ if __name__ == "__main__":
             logging.info("Mask saved to {}".format(out_files[i]))
 
         if args.viz:
-            logging.info("Visualizing results for image {}, close to continue ...".format(fn))
+            logging.info(
+                "Visualizing results for image {}, close to continue ...".format(fn))
             plot_img_and_mask(img, mask)

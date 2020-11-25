@@ -3,11 +3,13 @@
 Author: TJUZQC
 Date: 2020-10-25 13:47:32
 LastEditors: TJUZQC
-LastEditTime: 2020-11-20 15:29:51
+LastEditTime: 2020-11-20 19:22:00
 Description: None
 '''
 from torch.nn import init
+
 from . import *
+
 
 def init_weights(net, init_type='normal', gain=0.02):
     def init_func(m):
@@ -22,7 +24,8 @@ def init_weights(net, init_type='normal', gain=0.02):
             elif init_type == 'orthogonal':
                 init.orthogonal_(m.weight.data, gain=gain)
             else:
-                raise NotImplementedError('initialization method [%s] is not implemented' % init_type)
+                raise NotImplementedError(
+                    'initialization method [%s] is not implemented' % init_type)
             if hasattr(m, 'bias') and m.bias is not None:
                 init.constant_(m.bias.data, 0.0)
         elif classname.find('BatchNorm2d') != -1:
@@ -32,15 +35,16 @@ def init_weights(net, init_type='normal', gain=0.02):
     print('initialize network with %s' % init_type)
     net.apply(init_func)
 
-def ChooseModel(model_name:str):
+
+def ChooseModel(model_name: str):
     switch = {'unet': U_Net,
               'r2unet': R2U_Net,
               'attunet': AttU_Net,
               'r2attunet': R2AttU_Net,
               'hsunet': HSU_Net,
-            #   'fcn8s': FCN8s,
-            #   'fcn16s': FCN16s,
-            #   'fcn32s': FCN32s,
-            #   'fcn1s': FCN1s,
+              #   'fcn8s': FCN8s,
+              #   'fcn16s': FCN16s,
+              #   'fcn32s': FCN32s,
+              #   'fcn1s': FCN1s,
               }
     return switch.get(model_name, None)

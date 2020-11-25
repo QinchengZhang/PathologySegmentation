@@ -1,15 +1,17 @@
 
 from __future__ import print_function
+
+import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
+from torch.nn import init
 from torchvision import models
 from torchvision.models.vgg import VGG
-import torch.nn.functional as F
-from torch.nn import init
-import numpy as np
 
 """
+Fully convolutional network
 """
 
 
@@ -31,35 +33,47 @@ def get_upsample_weight(in_channels, out_channels, kernel_size):
 
     return torch.from_numpy(weight).float()
 
+
 class FCN32s(nn.Module):
-    def __init__(self, pretrained_net='vgg16',n_channels=3, n_classes=1, bilinear=True):
+    def __init__(self, pretrained_net='vgg16', n_channels=3, n_classes=1, bilinear=True):
         super().__init__()
         self.bilinear = bilinear
         self.n_channels = n_channels
         self.n_classes = n_classes
         self.pretrained_net = VGGNet(model=pretrained_net)
         self.relu = nn.ReLU(inplace=True)
-        self.deconv1 = nn.ConvTranspose2d(512, 512, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv1 = nn.ConvTranspose2d(
+            512, 512, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn1 = nn.BatchNorm2d(512)
-        self.deconv2 = nn.ConvTranspose2d(512, 256, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv2 = nn.ConvTranspose2d(
+            512, 256, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn2 = nn.BatchNorm2d(256)
-        self.deconv3 = nn.ConvTranspose2d(256, 128, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv3 = nn.ConvTranspose2d(
+            256, 128, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn3 = nn.BatchNorm2d(128)
-        self.deconv4 = nn.ConvTranspose2d(128, 64, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv4 = nn.ConvTranspose2d(
+            128, 64, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn4 = nn.BatchNorm2d(64)
-        self.deconv5 = nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv5 = nn.ConvTranspose2d(
+            64, 32, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn5 = nn.BatchNorm2d(32)
         self.classifier = nn.Conv2d(32, n_classes, kernel_size=1)
 
     def forward(self, x):
         output = self.pretrained_net.forward(x)
         x5 = output['x5']  # size=[n, 512, x.h/32, x.w/32]
-        score = self.bn1(self.relu(self.deconv1(x5)))        # size=[n, 512, x.h/16, x.w/16]
-        score = self.bn2(self.relu(self.deconv2(score)))     # size=[n, 256, x.h/8, x.w/8]
-        score = self.bn3(self.relu(self.deconv3(score)))     # size=[n, 128, x.h/4, x.w/4]
-        score = self.bn4(self.relu(self.deconv4(score)))     # size=[n, 64, x.h/2, x.w/2]
-        score = self.bn5(self.relu(self.deconv5(score)))     # size=[n, 32, x.h, x.w]
-        score = self.classifier(score)                       # size=[n, n_class, x.h, x.w]
+        # size=[n, 512, x.h/16, x.w/16]
+        score = self.bn1(self.relu(self.deconv1(x5)))
+        # size=[n, 256, x.h/8, x.w/8]
+        score = self.bn2(self.relu(self.deconv2(score)))
+        # size=[n, 128, x.h/4, x.w/4]
+        score = self.bn3(self.relu(self.deconv3(score)))
+        # size=[n, 64, x.h/2, x.w/2]
+        score = self.bn4(self.relu(self.deconv4(score)))
+        score = self.bn5(self.relu(self.deconv5(score))
+                         )     # size=[n, 32, x.h, x.w]
+        # size=[n, n_class, x.h, x.w]
+        score = self.classifier(score)
 
         return score
 
@@ -70,15 +84,20 @@ class FCN16s(nn.Module):
         self.n_class = n_class
         self.pretrained_net = pretrained_net
         self.relu = nn.ReLU(inplace=True)
-        self.deconv1 = nn.ConvTranspose2d(512, 512, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv1 = nn.ConvTranspose2d(
+            512, 512, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn1 = nn.BatchNorm2d(512)
-        self.deconv2 = nn.ConvTranspose2d(512, 256, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv2 = nn.ConvTranspose2d(
+            512, 256, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn2 = nn.BatchNorm2d(256)
-        self.deconv3 = nn.ConvTranspose2d(256, 128, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv3 = nn.ConvTranspose2d(
+            256, 128, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn3 = nn.BatchNorm2d(128)
-        self.deconv4 = nn.ConvTranspose2d(128, 64, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv4 = nn.ConvTranspose2d(
+            128, 64, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn4 = nn.BatchNorm2d(64)
-        self.deconv5 = nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv5 = nn.ConvTranspose2d(
+            64, 32, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn5 = nn.BatchNorm2d(32)
         self.classifier = nn.Conv2d(32, n_class, kernel_size=1)
 
@@ -87,13 +106,20 @@ class FCN16s(nn.Module):
         x5 = output['x5']  # size=[n, 512, x.h/32, x.w/32]
         x4 = output['x4']  # size=[n, 512, x.h/16, x.w/16]
 
-        score = self.relu(self.deconv1(x5))                  # size=[n, 512, x.h/16, x.w/16]
-        score = self.bn1(score + x4)                         # element-wise add, size=[n, 512, x.h/16, x.w/16]
-        score = self.bn2(self.relu(self.deconv2(score)))     # size=[n, 256, x.h/8, x.w/8]
-        score = self.bn3(self.relu(self.deconv3(score)))     # size=[n, 128, x.h/4, x.w/4]
-        score = self.bn4(self.relu(self.deconv4(score)))     # size=[n, 64, x.h/2, x.w/2]
-        score = self.bn5(self.relu(self.deconv5(score)))     # size=[n, 32, x.h, x.w]
-        score = self.classifier(score)                       # size=[n, n_class, x.h, x.w]
+        # size=[n, 512, x.h/16, x.w/16]
+        score = self.relu(self.deconv1(x5))
+        # element-wise add, size=[n, 512, x.h/16, x.w/16]
+        score = self.bn1(score + x4)
+        # size=[n, 256, x.h/8, x.w/8]
+        score = self.bn2(self.relu(self.deconv2(score)))
+        # size=[n, 128, x.h/4, x.w/4]
+        score = self.bn3(self.relu(self.deconv3(score)))
+        # size=[n, 64, x.h/2, x.w/2]
+        score = self.bn4(self.relu(self.deconv4(score)))
+        score = self.bn5(self.relu(self.deconv5(score))
+                         )     # size=[n, 32, x.h, x.w]
+        # size=[n, n_class, x.h, x.w]
+        score = self.classifier(score)
 
         return score
 
@@ -104,15 +130,20 @@ class FCN8s(nn.Module):
         self.n_class = n_class
         self.pretrained_net = pretrained_net
         self.relu = nn.ReLU(inplace=True)
-        self.deconv1 = nn.ConvTranspose2d(512, 512, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv1 = nn.ConvTranspose2d(
+            512, 512, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn1 = nn.BatchNorm2d(512)
-        self.deconv2 = nn.ConvTranspose2d(512, 256, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv2 = nn.ConvTranspose2d(
+            512, 256, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn2 = nn.BatchNorm2d(256)
-        self.deconv3 = nn.ConvTranspose2d(256, 128, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv3 = nn.ConvTranspose2d(
+            256, 128, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn3 = nn.BatchNorm2d(128)
-        self.deconv4 = nn.ConvTranspose2d(128, 64, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv4 = nn.ConvTranspose2d(
+            128, 64, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn4 = nn.BatchNorm2d(64)
-        self.deconv5 = nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv5 = nn.ConvTranspose2d(
+            64, 32, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn5 = nn.BatchNorm2d(32)
         self.classifier = nn.Conv2d(32, n_class, kernel_size=1)
 
@@ -134,14 +165,21 @@ class FCN8s(nn.Module):
         x4 = output['x4']  # size=[n, 512, x.h/16, x.w/16]
         x3 = output['x3']  # size=[n, 512, x.h/8, x.w/8]
 
-        score = self.relu(self.deconv1(x5))                  # size=[n, 512, x.h/16, x.w/16]
-        score = self.bn1(score + x4)                         # element-wise add, size=[n, 512, x.h/16, x.w/16]
-        score = self.relu(self.deconv2(score))               # size=[n, 256, x.h/8, x.w/8]
+        # size=[n, 512, x.h/16, x.w/16]
+        score = self.relu(self.deconv1(x5))
+        # element-wise add, size=[n, 512, x.h/16, x.w/16]
+        score = self.bn1(score + x4)
+        # size=[n, 256, x.h/8, x.w/8]
+        score = self.relu(self.deconv2(score))
         score = self.bn2(score+x3)
-        score = self.bn3(self.relu(self.deconv3(score)))     # size=[n, 128, x.h/4, x.w/4]
-        score = self.bn4(self.relu(self.deconv4(score)))     # size=[n, 64, x.h/2, x.w/2]
-        score = self.bn5(self.relu(self.deconv5(score)))     # size=[n, 32, x.h, x.w]
-        score = self.classifier(score)                       # size=[n, n_class, x.h, x.w]
+        # size=[n, 128, x.h/4, x.w/4]
+        score = self.bn3(self.relu(self.deconv3(score)))
+        # size=[n, 64, x.h/2, x.w/2]
+        score = self.bn4(self.relu(self.deconv4(score)))
+        score = self.bn5(self.relu(self.deconv5(score))
+                         )     # size=[n, 32, x.h, x.w]
+        # size=[n, n_class, x.h, x.w]
+        score = self.classifier(score)
 
         return score
 
@@ -157,8 +195,9 @@ class FCN8s(nn.Module):
             if isinstance(m, nn.ConvTranspose2d):
                 assert m.kernel_size[0] == m.kernel_size[1]
                 initial_weight = get_upsample_weight(m.in_channels,
-                            m.out_channels, m.kernel_size[0])
-                m.weight.data.copy_(initial_weight)                 # copy not = ?
+                                                     m.out_channels, m.kernel_size[0])
+                # copy not = ?
+                m.weight.data.copy_(initial_weight)
 
 
 class FCN1s(nn.Module):
@@ -167,15 +206,20 @@ class FCN1s(nn.Module):
         self.n_class = n_class
         self.pretrained_net = pretrained_net
         self.relu = nn.ReLU(inplace=True)
-        self.deconv1 = nn.ConvTranspose2d(512, 512, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv1 = nn.ConvTranspose2d(
+            512, 512, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn1 = nn.BatchNorm2d(512)
-        self.deconv2 = nn.ConvTranspose2d(512, 256, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv2 = nn.ConvTranspose2d(
+            512, 256, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn2 = nn.BatchNorm2d(256)
-        self.deconv3 = nn.ConvTranspose2d(256, 128, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv3 = nn.ConvTranspose2d(
+            256, 128, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn3 = nn.BatchNorm2d(128)
-        self.deconv4 = nn.ConvTranspose2d(128, 64, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv4 = nn.ConvTranspose2d(
+            128, 64, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn4 = nn.BatchNorm2d(64)
-        self.deconv5 = nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+        self.deconv5 = nn.ConvTranspose2d(
+            64, 32, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn5 = nn.BatchNorm2d(32)
         self.classifier = nn.Conv2d(32, n_class, kernel_size=1)
 
@@ -187,18 +231,26 @@ class FCN1s(nn.Module):
         x2 = output['x2']  # size=[n, 512, x.h/4, x.w/4]
         x1 = output['x1']  # size=[n, 512, x.h/2, x.w/2]
 
-        score = self.relu(self.deconv1(x5))                  # size=[n, 512, x.h/16, x.w/16]
-        score = self.bn1(score + x4)                         # element-wise add, size=[n, 512, x.h/16, x.w/16]
-        score = self.relu(self.deconv2(score))               # size=[n, 256, x.h/8, x.w/8]
+        # size=[n, 512, x.h/16, x.w/16]
+        score = self.relu(self.deconv1(x5))
+        # element-wise add, size=[n, 512, x.h/16, x.w/16]
+        score = self.bn1(score + x4)
+        # size=[n, 256, x.h/8, x.w/8]
+        score = self.relu(self.deconv2(score))
         score = self.bn2(score+x3)
-        score = self.relu(self.deconv3(score))               # size=[n, 128, x.h/4, x.w/4]
+        # size=[n, 128, x.h/4, x.w/4]
+        score = self.relu(self.deconv3(score))
         score = self.bn3(score+x2)
-        score = self.relu(self.deconv4(score))               # size=[n, 64, x.h/2, x.w/2]
+        # size=[n, 64, x.h/2, x.w/2]
+        score = self.relu(self.deconv4(score))
         score = self.bn4(score+x1)
-        score = self.bn5(self.relu(self.deconv5(score)))     # size=[n, 32, x.h, x.w]
-        score = self.classifier(score)                       # size=[n, n_class, x.h, x.w]
+        score = self.bn5(self.relu(self.deconv5(score))
+                         )     # size=[n, 32, x.h, x.w]
+        # size=[n, n_class, x.h, x.w]
+        score = self.classifier(score)
 
         return score
+
 
 ranges = {
     'vgg11': ((0, 3), (3, 6),  (6, 11),  (11, 16), (16, 21)),
@@ -552,7 +604,8 @@ if __name__ == "__main__":
     criterion = nn.BCELoss()
     optimizer = optim.SGD(fcn_model.parameters(), lr=1e-3, momentum=0.9)
     input = torch.autograd.Variable(torch.randn(batch_size, 3, h, w))
-    y = torch.autograd.Variable(torch.randn(batch_size, n_class, h, w), requires_grad=False)
+    y = torch.autograd.Variable(torch.randn(
+        batch_size, n_class, h, w), requires_grad=False)
     for iter in range(10):
         optimizer.zero_grad()
         output = fcn_model(input)

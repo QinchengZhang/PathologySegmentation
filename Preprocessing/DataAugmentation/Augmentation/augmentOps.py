@@ -3,12 +3,15 @@
 Author: TJUZQC
 Date: 2020-09-15 11:45:59
 LastEditors: TJUZQC
-LastEditTime: 2020-09-17 11:57:59
+LastEditTime: 2020-11-20 19:25:13
 Description: None
 '''
-import Augmentation.basicOps
-from PIL import Image
 import random
+
+from PIL import Image
+
+import Augmentation.basicOps
+
 
 class RandomChoice(object):
     def __init__(self, transforms):
@@ -21,6 +24,7 @@ class RandomChoice(object):
         print(str(self.transforms[ops-1]))
         return self.transforms[ops-1](img)
 
+
 class RandomChoiceWithMask(object):
     def __init__(self, transforms):
         assert isinstance(transforms, list), 'transforms should be a list but got {}'.format(
@@ -31,6 +35,7 @@ class RandomChoiceWithMask(object):
         ops = random.randint(1, len(self.transforms))
         print(str(self.transforms[ops-1]))
         return self.transforms[ops-1](img, mask)
+
 
 class ApplyOps(object):
     def __init__(self, transforms):
@@ -44,7 +49,8 @@ class ApplyOps(object):
             ret_img = ops(img)
             print(str(ops))
         return ret_img
-        
+
+
 class ApplyOpsWithMask(object):
     def __init__(self, transforms):
         assert isinstance(transforms, list), 'transforms should be a list but got {}'.format(
@@ -57,5 +63,3 @@ class ApplyOpsWithMask(object):
             ret_img, ret_mask = ops(img, mask)
             print(str(ops))
         return ret_img, ret_mask
-
-

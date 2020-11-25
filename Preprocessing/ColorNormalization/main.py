@@ -11,13 +11,14 @@
 # input image should be color image
 # Python implementation by: Goutham Ramakrishnan, goutham7r@gmail.com
 
-import tensorflow as tf
 import glob
-import sys
 import os
+import sys
 
+import tensorflow as tf
+
+from Run_ColorNorm import run_batch_colornorm, run_colornorm
 from Run_StainSep import run_stainsep
-from Run_ColorNorm import run_colornorm, run_batch_colornorm
 
 # setting tensorflow verbosity
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'

@@ -6,30 +6,30 @@ import sys
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
+import yaml
 from torch import optim
+from torch.utils.data import DataLoader, random_split
+from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
 from evaluation import *
-import torch.nn.functional as F
-import sys
 # from unet import U_Net, R2U_Net, AttU_Net, R2AttU_Net, init_weights
 from models import ChooseModel
-
-from torch.utils.tensorboard import SummaryWriter
 from utils.dataset import BasicDataset
-from torch.utils.data import DataLoader, random_split
-import yaml
 
 conf = yaml.load(open(os.path.join(
     sys.path[0], 'config', 'evaluate.yaml')), Loader=yaml.FullLoader)
 dir_img = conf['DATASET']['IMGS_DIR']
 dir_mask = conf['DATASET']['MASKS_DIR']
 
+
 def count_param(model):
     param_count = 0
     for param in model.parameters():
         param_count += param.view(-1).size()[0]
     return param_count
+
 
 def evaluate_net(net,
                  device,

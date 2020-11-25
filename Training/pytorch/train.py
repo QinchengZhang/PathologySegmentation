@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-10-26 10:26:51
 LastEditors: TJUZQC
-LastEditTime: 2020-11-20 15:24:57
+LastEditTime: 2020-11-20 19:23:55
 Description: None
 '''
 import argparse
@@ -14,19 +14,18 @@ import sys
 import numpy as np
 import torch
 import torch.nn as nn
+import yaml
 from torch import optim
+from torch.utils.data import DataLoader, random_split
+from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
 from evaluation import eval_net
-import sys
 from models import ChooseModel, init_weights
-
-from torch.utils.tensorboard import SummaryWriter
 from utils.dataset import BasicDataset
-from torch.utils.data import DataLoader, random_split
-import yaml
 
-conf = yaml.load(open(os.path.join(sys.path[0], 'config', 'config.yaml')), Loader=yaml.FullLoader)
+conf = yaml.load(open(os.path.join(
+    sys.path[0], 'config', 'config.yaml')), Loader=yaml.FullLoader)
 dir_img = conf['DATASET']['IMGS_DIR']
 dir_mask = conf['DATASET']['MASKS_DIR']
 dir_checkpoint = conf['MODEL']['CHECKPOINT_DIR']
@@ -44,9 +43,10 @@ def train_net(net,
               optimizer='adam',
               classes=2,
               lr_scheduler='steplr',
-              lr_scheduler_cfgs:dict={'step_size':10}):
+              lr_scheduler_cfgs: dict = {'step_size': 10}):
 
-    dataset = BasicDataset(dir_img, dir_mask, img_scale, train=True, classes=classes)
+    dataset = BasicDataset(dir_img, dir_mask, img_scale,
+                           train=True, classes=classes)
     n_val = int(len(dataset) * val_percent)
     n_train = len(dataset) - n_val
     train, val = random_split(dataset, [n_train, n_val])
@@ -96,7 +96,8 @@ def train_net(net,
         'cycliclr': torch.optim.lr_scheduler.CyclicLR,
         'onecyclelr': torch.optim.lr_scheduler.OneCycleLR,
     }
-    lr_scheduler = lr_scheduler_getter.get(lr_scheduler.lower(), None)(optimizer, **lr_scheduler_cfgs)
+    lr_scheduler = lr_scheduler_getter.get(
+        lr_scheduler.lower(), None)(optimizer, **lr_scheduler_cfgs)
     if use_apex:
         try:
             from apex import amp
@@ -237,9 +238,10 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO,
                         format='%(levelname)s: %(message)s')
     args = get_args()
-    device = torch.device('cuda' if torch.cuda.is_available() and conf['DEVICE'].lower() == 'cuda' else 'cpu')
+    device = torch.device('cuda' if torch.cuda.is_available(
+    ) and conf['DEVICE'].lower() == 'cuda' else 'cpu')
     logging.info(f'Using device {device}')
-    
+
     network = args.network.lower()
     # Change here to adapt to your data
     # n_channels=3 for RGB images
@@ -250,7 +252,7 @@ if __name__ == '__main__':
     net = ChooseModel(network)(
         n_channels=3, n_classes=conf['DATASET']['NUM_CLASSES'])
     assert net is not None, f'check your argument --network'
-    
+
     logging.info(f'Network:\n'
                  f'\t{net.n_channels} input channels\n'
                  f'\t{net.n_classes} output channels (classes)\n'
