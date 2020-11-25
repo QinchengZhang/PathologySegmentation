@@ -3,9 +3,16 @@
 Author: TJUZQC
 Date: 2020-11-25 13:40:58
 LastEditors: TJUZQC
-LastEditTime: 2020-11-25 13:40:59
+LastEditTime: 2020-11-25 14:03:04
 Description: None
 '''
+import paddle
+from paddle import nn
+import paddle.nn.functional as F
+
+from paddleseg.cvlibs import manager
+
+
 @manager.LOSSES.add_component
 class BCEWithLogitsLoss(nn.Layer):
     """
@@ -19,7 +26,7 @@ class BCEWithLogitsLoss(nn.Layer):
             when set to'sum', the sum of BCELoss is calculated; when set to'none', the original loss is returned.
         pos_weight (Tensor): Manually specify the weight of the positive class, which must be a vector
             of the same length as the number of classes. The data type is float32, float64.
-        
+
     """
 
     def __init__(self,

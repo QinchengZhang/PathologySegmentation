@@ -3,9 +3,16 @@
 Author: TJUZQC
 Date: 2020-11-25 13:40:28
 LastEditors: TJUZQC
-LastEditTime: 2020-11-25 13:40:29
+LastEditTime: 2020-11-25 14:03:19
 Description: None
 '''
+import paddle
+from paddle import nn
+import paddle.nn.functional as F
+
+from paddleseg.cvlibs import manager
+
+
 @manager.LOSSES.add_component
 class BCELoss(nn.Layer):
     """
@@ -17,7 +24,7 @@ class BCELoss(nn.Layer):
         reduction (str): Specify the calculation method applied to the output result, the optional
             values ​​are:'none','mean','sum'. The default is'mean', which calculates the mean of BCELoss;
             when set to'sum', the sum of BCELoss is calculated; when set to'none', the original loss is returned.
-        
+
     """
 
     def __init__(self, weight=None, reduction='mean'):
