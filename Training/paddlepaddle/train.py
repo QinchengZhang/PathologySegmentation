@@ -109,8 +109,6 @@ def main(args):
         iters=args.iters,
         batch_size=args.batch_size)
 
-    print(paddle.Model(cfg.model).summary((-1, 3, 256, 256)))
-
     train_dataset = cfg.train_dataset
     if not train_dataset:
         raise RuntimeError(
