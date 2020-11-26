@@ -113,7 +113,7 @@ def train(model,
             labels = data[1].astype('int64')
             if nranks > 1:
                 logits = ddp_model(images)
-                print(logits.shape)
+                print(logits[0].shape)
                 loss = loss_computation(logits, labels, losses)
                 # loss = ddp_model.scale_loss(loss)
                 loss.backward()
