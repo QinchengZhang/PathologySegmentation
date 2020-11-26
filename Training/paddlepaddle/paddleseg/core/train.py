@@ -120,6 +120,7 @@ def train(model,
                 # ddp_model.apply_collective_grads()
             else:
                 logits = model(images)
+                print(logits.shape)
                 loss = loss_computation(logits, labels, losses)
                 loss.backward()
             optimizer.step()
