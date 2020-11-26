@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+'''
+Author: TJUZQC
+Date: 2020-11-25 16:12:55
+LastEditors: TJUZQC
+LastEditTime: 2020-11-26 12:24:23
+Description: None
+'''
 # Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,4 +26,4 @@ from .metrics import ConfusionMatrix
 from .env import seg_env, get_sys_env
 from .utils import *
 from .timer import Timer, calculate_eta
-from .visualize import visualize
+from .visualize import visualize, get_color_map_list

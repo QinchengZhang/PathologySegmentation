@@ -1,3 +1,10 @@
+<!--
+ * @Author: TJUZQC
+ * @Date: 2020-11-25 16:12:55
+ * @LastEditors: TJUZQC
+ * @LastEditTime: 2020-11-26 12:52:38
+ * @Description: None
+-->
 # Rethinking Atrous Convolution for Semantic Image Segmentation
 
 ## Reference

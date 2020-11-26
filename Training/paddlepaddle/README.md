@@ -2,12 +2,12 @@
  * @Author: TJUZQC
  * @Date: 2020-11-22 14:57:05
  * @LastEditors: TJUZQC
- * @LastEditTime: 2020-11-24 18:24:16
+ * @LastEditTime: 2020-11-26 13:00:18
  * @Description: None
 -->
 # PaddleSeg（动态图版本）
 
-本目录提供了PaddleSeg的动态图版本，目前已经完成了模型训练、评估、数据处理等功能，在未来的版本中，PaddleSeg将会启动默认的动态图模式。目前该目录处于实验阶段，如果您在使用过程中遇到任何问题，请通过issue反馈给我们，我们将会在第一时间跟进处理。
+本目录提供了PaddleSeg的动态图版本修改版，基于PaddleSeg的动态图版本
 
 ## 模型库
 

@@ -20,6 +20,7 @@ import paddle
 import tqdm
 
 from paddleseg import utils
+from PIL import Image
 import paddleseg.utils.logger as logger
 
 
@@ -28,6 +29,26 @@ def mkdir(path):
     if not os.path.exists(sub_dir):
         os.makedirs(sub_dir)
 
+def get_color_map_list(num_classes):
+    """ Returns the color map for visualizing the segmentation mask,
+        which can support arbitrary number of classes.
+    Args:
+        num_classes: Number of classes
+    Returns:
+        The color map
+    """
+    color_map = num_classes * [0, 0, 0]
+    for i in range(0, num_classes):
+        j = 0
+        lab = i
+        while lab:
+            color_map[i * 3] |= (((lab >> 0) & 1) << (7 - j))
+            color_map[i * 3 + 1] |= (((lab >> 1) & 1) << (7 - j))
+            color_map[i * 3 + 2] |= (((lab >> 2) & 1) << (7 - j))
+            j += 1
+            lab >>= 3
+
+    return color_map
 
 def predict(model,
             model_path,
@@ -53,6 +74,7 @@ def predict(model,
 
     added_saved_dir = os.path.join(save_dir, 'added_prediction')
     pred_saved_dir = os.path.join(save_dir, 'pseudo_color_prediction')
+    pred_one_channel_saved_dir = os.path.join(save_dir, 'one_channel_pseudo_color_prediction')
 
     logger.info("Start to predict...")
     for im_path in tqdm.tqdm(image_list):
@@ -93,3 +115,12 @@ def predict(model,
         pred_saved_path = os.path.join(pred_saved_dir, im_file)
         mkdir(pred_saved_path)
         cv2.imwrite(pred_saved_path, pred_im)
+
+        # save one channel pseudo color prediction
+        pred_im_one_channel = Image.fromarray(pred)
+        pred_im_one_channel = pred_im_one_channel.convert('P')
+        colormap = get_color_map_list(256)
+        pred_im_one_channel.putpalette(colormap)
+        pred_one_channel_saved_path = os.path.join(pred_one_channel_saved_dir, im_file)
+        mkdir(pred_one_channel_saved_path.replace('jpg', 'png'))
+        pred_im_one_channel.save(pred_one_channel_saved_path.replace('jpg', 'png'))
