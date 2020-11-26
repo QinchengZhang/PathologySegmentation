@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-11-25 13:40:58
 LastEditors: TJUZQC
-LastEditTime: 2020-11-26 14:05:59
+LastEditTime: 2020-11-26 14:14:23
 Description: None
 '''
 import paddle
@@ -44,9 +44,9 @@ class BCEWithLogitsLoss(nn.Layer):
         self.pos_weight = pos_weight
 
     def forward(self, logit, label):
-        if logit.dtype not in ['float32','float64']:
+        if logit.dtype not in [paddle.ones((1), dtype='float32').dtype, paddle.ones((1), dtype='float64').dtype]:
             logit = logit.astype('float32')
-        if label.dtype not in ['float32','float64']:
+        if label.dtype not in [paddle.ones((1), dtype='float32').dtype, paddle.ones((1), dtype='float64').dtype]:
             label = label.astype('float32')
         out = F.binary_cross_entropy_with_logits(
             logit, label, self.weight, self.reduction, self.pos_weight)
