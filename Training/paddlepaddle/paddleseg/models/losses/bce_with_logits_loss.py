@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-11-25 13:40:58
 LastEditors: TJUZQC
-LastEditTime: 2020-11-26 14:20:06
+LastEditTime: 2020-11-26 14:21:30
 Description: None
 '''
 import paddle
@@ -44,6 +44,7 @@ class BCEWithLogitsLoss(nn.Layer):
         self.pos_weight = pos_weight
 
     def forward(self, logit, label):
+        print(logit.shape)
         float32_tensor = paddle.to_tensor(1.0)
 
         float64_tensor = paddle.cast(float32_tensor, dtype='float64')
