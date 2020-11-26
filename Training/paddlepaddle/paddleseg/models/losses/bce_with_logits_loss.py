@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-11-25 13:40:58
 LastEditors: TJUZQC
-LastEditTime: 2020-11-26 14:25:07
+LastEditTime: 2020-11-26 14:26:16
 Description: None
 '''
 import paddle
@@ -45,6 +45,7 @@ class BCEWithLogitsLoss(nn.Layer):
 
     def forward(self, logit, label):
         logit = logit.squeeze(1)
+        print(logit.shape, label.shape)
         float32_tensor = paddle.to_tensor(1.0)
 
         float64_tensor = paddle.cast(float32_tensor, dtype='float64')
