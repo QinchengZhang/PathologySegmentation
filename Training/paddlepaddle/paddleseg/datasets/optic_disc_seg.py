@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-11-25 10:05:57
 LastEditors: TJUZQC
-LastEditTime: 2020-11-26 15:27:30
+LastEditTime: 2020-11-26 15:34:35
 Description: None
 '''
 # Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
@@ -49,7 +49,7 @@ class OpticDiscSeg(Dataset):
         mode = mode.lower()
         self.mode = mode
         self.file_list = list()
-        self.num_classes = 1
+        self.num_classes = 2
         self.ignore_index = 255
 
         if mode not in ['train', 'val', 'test']:
