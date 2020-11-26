@@ -109,6 +109,8 @@ def main(args):
         iters=args.iters,
         batch_size=args.batch_size)
 
+    print(cfg.model.num_classes)
+
     train_dataset = cfg.train_dataset
     if not train_dataset:
         raise RuntimeError(
