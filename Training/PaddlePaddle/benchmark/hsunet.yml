@@ -1,0 +1,42 @@
+batch_size: 4
+iters: 100000
+
+train_dataset:
+  type: RemoteSensing
+  dataset_root: F:/DATASET/BDCI_rs_data
+  transforms:
+    - type: RandomHorizontalFlip
+    - type: RandomDistort
+    - type: Normalize
+  mode: train
+
+val_dataset:
+  type: RemoteSensing
+  dataset_root: F:/DATASET/BDCI_rs_data
+  transforms:
+    - type: Normalize
+  mode: val
+
+model:
+  type: HS_UNet
+  num_classes: 7
+  use_deconv: True
+  split: 5
+
+optimizer:
+  type: sgd
+  momentum: 0.9
+  weight_decay: 0.00004
+
+learning_rate:
+  value: 0.01
+  decay:
+    type: poly
+    power: 0.9
+    end_lr: 0.0001
+
+loss:
+  types:
+    - type: CrossEntropyLoss
+      ignore_index: 255
+  coef: [1]

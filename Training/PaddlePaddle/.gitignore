@@ -1,0 +1,9 @@
+.history
+saved_model/
+__pycache__/
+.pytest_cache/
+.vscode/
+.idea/
+*/__pycache__
+/*.yml
+predict*/
