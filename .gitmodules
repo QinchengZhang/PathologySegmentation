@@ -1,0 +1,3 @@
+[submodule "PaddleSeg_dygraph"]
+	path = PaddleSeg_dygraph
+	url = https://github.com/QinchengZhang/PaddleSeg_dygraph.git
