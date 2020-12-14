@@ -1,3 +1,6 @@
 [submodule "Training/PaddlePaddle"]
 	path = Training/PaddlePaddle
 	url = https://github.com/QinchengZhang/PaddleSeg_dygraph.git
+[submodule "SegmentationViewer"]
+	path = SegmentationViewer
+	url = https://github.com/QinchengZhang/SegmentationViewer.git
