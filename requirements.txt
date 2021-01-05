@@ -1,0 +1,16 @@
+ASAPTools==0.6.2
+libtiff==0.4.2
+matplotlib==3.3.2
+nibabel==3.2.1
+numpy==1.19.2
+opencv-python==4.4.0.42
+openslide-python==1.1.1
+paddlepaddle-gpu==2.0.0rc0.post100
+Pillow==7.2.0
+PyQt5==5.15.0
+PyYAML==5.3.1
+torch==1.7.0+cu101
+torchsummary==1.5.1
+torchvision==0.8.1+cu101
+tqdm==4.49.0
+visualdl==2.0.4
