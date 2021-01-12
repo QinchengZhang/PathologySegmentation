@@ -3,7 +3,7 @@
 Author: TJUZQC
 Date: 2020-11-05 12:29:09
 LastEditors: TJUZQC
-LastEditTime: 2021-01-05 13:49:49
+LastEditTime: 2021-01-11 17:10:13
 Description: None
 '''
 from paddle.vision import transforms
@@ -41,6 +41,7 @@ class RandomRotateTransform(BaseTransform):
         if isinstance(degrees, (tuple, list)):
             assert len(degrees) == 2, 'The length of argument degrees must be 2'
         self.degrees = random.randint(degrees[0], degrees[1]) if isinstance(degrees, (tuple, list)) else random.randint(-degrees, degrees)
+        print(self.degrees)
         self.resample = resample
         self.expand = expand
         self.center = center
@@ -88,7 +89,6 @@ class RandomOffsetTransform(BaseTransform):
         else:
             self.x_offset = random.randint(-offset, offset)
             self.y_offset = random.randint(-offset, offset)
-            print(self.x_offset, self.y_offset)
         self.padding = [0, 0, 0, 0] #left, top, right, bottom
         if self.x_offset >= 0:
             self.padding[0] = self.x_offset
